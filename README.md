@@ -1,2 +1,11 @@
 # SQL Injection Suite
 
+# Introducción
+En el constante desarrollo de tecnologías de la información y la creciente dependencia de sistemas informáticos en diversos ámbitos, la seguridad de las aplicaciones web se erige como una prioridad ineludible. La preservación de la integridad y confidencialidad de los datos almacenados y transmitidos a través de estas aplicaciones demanda una atención meticulosa hacia posibles vulnerabilidades. Entre las amenazas más comunes se encuentra la inyección SQL, una técnica utilizada por atacantes para comprometer la base de datos subyacente de una aplicación web.
+
+Este informe abordará el desarrollo de una suite de inyección SQL basada en la guía de PortSwigger, integrando la metodología de programación extrema (XP) y aprovechando las capacidades de SonarLint. PortSwigger Security es reconocido por ser un referente en la identificación y mitigación de vulnerabilidades en aplicaciones web, proporcionando pautas exhaustivas y herramientas que permiten a los desarrolladores mejorar la seguridad de sus aplicaciones.
+
+La implementación de la metodología XP añade un enfoque ágil y colaborativo al desarrollo de software, promoviendo la adaptabilidad y la mejora continua. Además, la integración de SonarLint, una herramienta de análisis estático de código para identificar posibles problemas de seguridad y calidad, fortalece aún más la robustez de la suite.
+
+A lo largo de este informe, se examinarán los principios clave de la metodología XP y cómo se aplican en el contexto del desarrollo de una suite de inyección SQL. También se destacará la importancia de SonarLint en la detección temprana de posibles vulnerabilidades en el código. Además, se detallará el proceso de implementación, desde la planificación hasta la entrega, siguiendo las directrices de PortSwigger. Cabe destacar que la programación de esta suite se llevó a cabo en Python, aprovechando la versatilidad y potencia de este lenguaje para proporcionar una solución eficiente y escalable. Este enfoque conjunto busca proporcionar una solución robusta y adaptable para enfrentar las amenazas derivadas de la inyección SQL en aplicaciones web, contribuyendo así a la construcción de entornos digitales más seguros y confiables.
+
