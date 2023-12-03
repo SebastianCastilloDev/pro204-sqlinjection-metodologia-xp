@@ -581,8 +581,13 @@ Estas recomendaciones buscan mejorar la efectividad y la seguridad en el desarro
 
 * **Extreme Programming: A Gentle Introduction:**
   * [Extreme Programming: A Gentle Introduction](http://www.extremeprogramming.org/)
-* **Extreme Programming Explained: Embrace Change (Libro de Kent Beck):**
-  * [Extreme Programming Explained on Amazon](https://www.amazon.com/Extreme-Programming-Explained-Kent-Beck/dp/0321278658)
+* **XP Practices for Secure Software Development:**
+   * [XP Practices for Secure Software Development](https://www.infoq.com/news/2008/04/XP-Security-Practices/)
+* **Extreme Programming for Security Teams:**
+   * [Extreme Programming for Security Teams](https://dzone.com/articles/extreme-programming-for-security-teams)
+* **Secure Coding Practices with Extreme Programming:**
+   * [Secure Coding Practices with Extreme Programming](https://resources.sei.cmu.edu/asset_files/Presentation/2007_017_001_23858.pdf)
+
 
 ### Técnicas de SQL Injection:
 
