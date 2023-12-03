@@ -35,6 +35,5 @@ def menu_de_opciones():
     return opcion
 
 
-
 if __name__ == "__main__":
     menu_de_opciones()

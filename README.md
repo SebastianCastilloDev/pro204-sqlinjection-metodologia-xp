@@ -548,6 +548,67 @@ La ejecución de estas tareas se realiza de manera iterativa, lo que permite man
 
 En resumen, la planificación de iteraciones en el desarrollo de la suite SQLInjection, basada en la metodología XP, proporciona agilidad, enfoque en lo esencial y una comunicación efectiva, contribuyendo al éxito del proyecto.
 
+## Soluciones Implementadas
+### Módulo de recuperación de datos ocultos. (SQL Injection UNION attack)
+
+Permite explorar y seleccionar enlaces relevantes en un sitio web objetivo. Este módulo facilita el análisis de seguridad al proporcionar una lista de enlaces detectados en la sección de filtros del sitio web, además una vez realizada la inyección SQL, podremos visualizar los datos que no estan disponibles al público.
+
+Podemos ver el código en este [enlace](/src/recuperar_datos_ocultos.py)
+
+### Módulo de login bypass para saltar el inicio de sesion. (SQL Injection UNION attack)
+
+Este módulo permite inyectar codigo SQL en un campo de formulario y acceder como usuario administrador al sitio web.
+
+Podemos ver el código en este [enlace](/src/saltar_inicio_sesion.py)
+
+### Módulo de consulta de tipo y version de la base de datos en Oracle. (SQL Injection UNION attack)
+
+Este módulo permite a través de inyeccion SQL, detectar el numero de columnas de la tabla consultada en la base de datos y luego a través de consultas específicas de Oracle obtener el tipo y version de la base de datos.
+
+Podemos ver el código en este [enlace](/src/consultar_version_oracle.py)
+
+### Módulo de consulta de tipo y version de base de datos en MySQL y SQL Server. (SQL Injection UNION attack)
+
+Este módulo permite a través de inyeccion SQL, detectar el numero de columnas de la tabla consultada en la base de datos y luego a través de consultas específicas de MySQL y SQL Server obtener el tipo y version de la base de datos.
+
+Podemos ver el código en este [enlace](/src/consultar_version_mysql_sqlserver.py)
+
+### Módulo de Listar el contenido de la base de datos. (SQL Injection UNION attack)
+
+Este módulo permite recorrer todas las tablas de la base de datos, pudiendo de esta manera localizar alguna tabla de usuarios, que contenga columnas con contraseñas.
+
+Podemos ver el código en este [enlace](/src/listar_contenido_bbdd.py)
+
+### Recuperar datos a partir de otras tablas. (SQL Injection UNION attack)
+
+Este modulo permite recuperar datos de otras tablas de la base de datos, teniendo en cuenta el numero de columnas y los tipos de dato de la consulta original.
+
+Podemos ver el código en este [enlace](/src/recuperar_datos_de_otras_tablas.py)
+
+### Recuperar múltiples valores en una sola columna. (SQL Injection UNION attack)
+
+Este módulo nos permite  recuperar múltiples valores de una tabla específica en una sola columna de la base de datos del sitio web. La aplicación ofrece flexibilidad al permitir la selección de la tabla y la columna de interés.
+
+Podemos ver el código en este [enlace](/src/recuperar_multiples_valores_en_una_sola_columna.py)
+
+### Buscar respuestas condicionales. (Blind SQL Injection)
+
+Este módulo permite atacar una cookie de rastreo para recolectar datos de analytics, sin embargo, en este tipo de ataques no existe una respuesta explícita de datos en el html, por lo tanto se analiza una respuesta basada en condiciones dependiendo de las condiciones inyectadas. Finalmente se realizar un ataque de fuerza bruta para obtener la contraseña de administrador.
+
+Podemos ver el código en este [enlace](/src/buscar_respuestas_condicionales.py)
+
+### Buscar errores condicionales. (Blind SQL Injection)
+
+Este módulo es similar al anterior, pero se basa en el análisis de respuestas de error por parte del servidor.
+
+Podemos ver el código en este [enlace](/src/buscar_errores_condicionales.py)
+
+### Inyección SQL con retraso de tiempo. (Blind SQL Injection)
+
+Este módulo nos permite obtener la contraseña de administrador, analizando los tiempos de respuesta del servidor, si la condicion inyectada es verdadera entonces desencadenaremos una retraso de tiempo en la respuesta.
+
+Podemos ver el código en este [enlace](/src/retraso_tiempo.py)
+
 # Conclusiones
 
 En primer lugar, la adopción de la metodología XP demostró ser un enfoque eficaz para el desarrollo de la suite, permitiendo una entrega iterativa y continua de funcionalidades clave. La planificación en iteraciones, junto con la flexibilidad para adaptarse a cambios en los requisitos, facilitó una respuesta ágil a las necesidades emergentes.
@@ -556,9 +617,6 @@ La colaboración activa entre los miembros del equipo, un principio fundamental 
 
 La implementación de prácticas XP, como el diseño CRC, el diseño iterativo y la programación just-in-time, no solo aceleró el proceso de desarrollo, sino que también mejoró la calidad del producto final. La incorporación de pruebas de aceptación desde el principio garantizó la integridad y funcionalidad de cada historia de usuario.
 
-En retrospectiva, el enfoque ágil de XP no solo demostró ser compatible con el desarrollo de una suite de seguridad como SQLInjection, sino que también resaltó la importancia de la adaptabilidad y la colaboración en entornos de desarrollo dinámicos.
-
-Estas conclusiones reflejan el éxito de la implementación de la suite SQLInjection bajo la metodología XP, subrayando la eficacia de los principios ágiles en el contexto de proyectos centrados en la seguridad del software.
 
 # Recomendaciones
 
@@ -607,22 +665,22 @@ Estas recomendaciones buscan mejorar la efectividad y la seguridad en el desarro
 ### Librerías de Python:
 
 * **Requests Library:**
-  * Documentación Oficial:[Requests](https://docs.python-requests.org/en/latest/)
-  * Repositorio en GitHub:[Requests on GitHub](https://github.com/psf/requests)
+  * Documentación Oficial: [Requests](https://docs.python-requests.org/en/latest/)
+  * Repositorio en GitHub: [Requests on GitHub](https://github.com/psf/requests)
 * **Beautiful Soup:**
-  * Documentación Oficial:[Beautiful Soup Documentation](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
-  * Repositorio en GitHub:[Beautiful Soup on GitHub](https://github.com/wention/BeautifulSoup4)
+  * Documentación Oficial: [Beautiful Soup Documentation](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
+  * Repositorio en GitHub: [Beautiful Soup on GitHub](https://github.com/wention/BeautifulSoup4)
 * **Regular Expressions (re):**
-  * Documentación Oficial:[re - Regular expression operations](https://docs.python.org/3/library/re.html)
+  * Documentación Oficial: [re - Regular expression operations](https://docs.python.org/3/library/re.html)
 * **Colorama:**
-  * Repositorio en GitHub:[Colorama on GitHub](https://github.com/tartley/colorama)
+  * Repositorio en GitHub: [Colorama on GitHub](https://github.com/tartley/colorama)
 * **Art (ASCII Art Generator):**
-  * Repositorio en GitHub:[Art on GitHub](https://github.com/sepandhaghighi/art)
+  * Repositorio en GitHub: [Art on GitHub](https://github.com/sepandhaghighi/art)
 * **Sys (Sys Module):**
-  * Documentación Oficial:[sys - System-specific parameters and functions](https://docs.python.org/3/library/sys.html)
+  * Documentación Oficial: [sys - System-specific parameters and functions](https://docs.python.org/3/library/sys.html)
 * **Urllib and Urllib3:**
-  * Documentación de Urllib:[Urllib - URL handling modules](https://docs.python.org/3/library/urllib.html)
-  * Documentación de Urllib3:[Urllib3 - HTTP library with thread-safe connection pooling](https://urllib3.readthedocs.io/)
+  * Documentación de Urllib: [Urllib - URL handling modules](https://docs.python.org/3/library/urllib.html)
+  * Documentación de Urllib3: [Urllib3 - HTTP library with thread-safe connection pooling](https://urllib3.readthedocs.io/)
 
 ### SonarLint y Reglas para Python:
 
@@ -633,6 +691,37 @@ Estas recomendaciones buscan mejorar la efectividad y la seguridad en el desarro
   * [SonarLint Rules for Python](https://rules.sonarsource.com/python)
 
 SonarLint es una herramienta de análisis estático de código que puede mejorar la calidad y seguridad del código fuente. Para el contexto de hacking ético, la aplicación de reglas específicas para Python puede ayudar a identificar posibles vulnerabilidades y mejorar la seguridad en el desarrollo de scripts y herramientas relacionadas con la seguridad informática. Las reglas específicas para Python proporcionadas por SonarLint ofrecen pautas valiosas para evitar problemas comunes y garantizar un código más robusto y seguro.
+
+# Anexo 2: Guía de uso de la herramienta.
+
+**Paso 1:** Ejecute el archivo `main.py`
+
+![Bienvenida de la aplicación](/img/1.png)
+
+**Paso 2:** Seleccione el tipo de ataque que desea llevar a cabo
+
+![Bienvenida de la aplicación](/img/2.png)
+
+**Paso 3:** Se muestra un enlace para generar un laboratorio en el sitio web de portswigger.
+
+![Bienvenida de la aplicación](/img/3.png)
+
+**Paso 4:** Explore el laboratorio.
+
+![Bienvenida de la aplicación](/img/4.png)
+
+**Paso 5:** Pegue la URL del laboratorio en la aplicación.
+
+![Bienvenida de la aplicación](/img/5.png)
+
+**Paso 6:** Seleccione un link para poder realizar el ataque.
+
+![Bienvenida de la aplicación](/img/6.png)
+
+**Paso 7:** Vea los resultados.
+
+![Bienvenida de la aplicación](/img/7.png)
+
 
 # Agradecimientos
 
@@ -653,7 +742,7 @@ Agradezco sinceramente a los siguientes autores por su valioso aporte y dedicaci
 
 Su dedicación en la realización de estos trabajos han enriquecido nuestro conocimiento en la metodología XP y su aplicación en el desarrollo de aplicaciones, marcando un impacto positivo en la confección de este documento.
 
-Adicionalmente, me he tomado el atrevimiento de agregar sus tesis de grado a la carpeta "documentos" de este repositorio. La intención es que estas valiosas contribuciones estén disponibles para que otros estudiantes e interesados en la metodología XP puedan aprender de sus investigaciones, de la misma manera en que yo he encontrado conocimiento en sus contenidos. Agradezco profundamente su generosidad al compartir sus trabajos, los cuales sin duda servirán como referencia y guía para futuros proyectos de desarrollo de software.
+Adicionalmente, me he tomado el atrevimiento de agregar sus tesis de grado a la carpeta "documentos" de este repositorio. La intención es que estas contribuciones estén disponibles para que otros estudiantes e interesados en la metodología XP puedan aprender de sus investigaciones, de la misma manera en que yo he encontrado conocimiento en sus contenidos. Agradezco profundamente su generosidad al compartir sus trabajos, los cuales sin duda servirán como referencia y guía para futuros proyectos de desarrollo de software.
 
-Un agradecimiento especial a Rana Khalil, Michael Sommer y Z3nsh3ll por su valioso aporte desde sus canales de YouTube. Sus contenidos han sido una fuente valiosa de inspiración para el desarrollo de este proyecto. Han tenido un impacto importante en mi aprendizaje y en la calidad de este trabajo.
+Un agradecimiento especial a Rana Khalil, Michael Sommer y Z3nsh3ll por su aporte desde sus canales de YouTube. Sus contenidos han sido una fuente de inspiración para el desarrollo de este proyecto. Han tenido un impacto importante en mi aprendizaje y en la calidad de este trabajo.
 

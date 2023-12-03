@@ -3,7 +3,7 @@ from colorama import init, Fore, Back
 
 def inicio():
     init()
-    titulo = text2art("SQL Injection")
+    titulo = text2art("         SQLi        Suite")
     print(Fore.RED + titulo + Fore.RESET)
     print(Fore.WHITE)
     print("\n\t\t" + Back.RED  + "Una herramienta para realizar SQL Injection" + Fore.RESET + Back.RESET + "\n")
