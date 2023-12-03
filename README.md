@@ -1,7 +1,8 @@
 # SQL Injection Suite
 
 # Tabla de Contenidos:
-- [SQL Injection Suite](#sql-injection-suite)
+
+- [Introducción](#introducción)
 - [Preliminares](#preliminares)
   - [Uso de Python en Herramientas de Seguridad y Hacking](#uso-de-python-en-herramientas-de-seguridad-y-hacking)
   - [Uso de SonarLint](#uso-de-sonarlint)
@@ -14,14 +15,14 @@
     - [Re](#re)
 - [Implementacion de la metodología XP](#implementacion-de-la-metodología-xp)
   - [Definición de Requerimientos y Objetivos de la Aplicación con Metodología XP](#definición-de-requerimientos-y-objetivos-de-la-aplicación-con-metodología-xp)
-    - [Definición de Requerimientos:](#definición-de-requerimientos:)
-    - [Definicion de objetivos:](#definicion-de-objetivos:)
+    - [Definición de Requerimientos:](#definición-de-requerimientos)
+    - [Definicion de objetivos:](#definicion-de-objetivos)
   - [Fases de la Metodología XP en el Desarrollo de Aplicaciones de Seguridad Web](#fases-de-la-metodología-xp-en-el-desarrollo-de-aplicaciones-de-seguridad-web)
-    - [1. Planificación:](#1.-planificación:)
-    - [2. Diseño:](#2.-diseño:)
-    - [3. Codificación:](#3.-codificación:)
-    - [4. Pruebas:](#4.-pruebas:)
-  - [Roles en XP para Aplicaciones de Seguridad Web:](#roles-en-xp-para-aplicaciones-de-seguridad-web:)
+    - [Planificación:](#1.-planificación)
+    - [Diseño:](#2.-diseño)
+    - [Codificación:](#3.-codificación)
+    - [Pruebas:](#4.-pruebas)
+  - [Roles en XP para Aplicaciones de Seguridad Web:](#roles-en-xp-para-aplicaciones-de-seguridad-web)
 - [Planificación del Proyecto](#planificación-del-proyecto)
   - [Historias de usuario](#historias-de-usuario)
     - [HU-Desarrollo-001](#hu-desarrollo-001)
@@ -120,7 +121,7 @@ Por otro lado, `colorama` se emplea para manipular los colores en la salida de l
 
 En el ámbito del Hacking Ético, la librería 're' se posiciona como una herramienta fundamental para los profesionales de la seguridad que buscan evaluar la robustez de sistemas y aplicaciones de manera ética y controlada. Su importancia radica en la capacidad para analizar y manipular patrones específicos en datos, proporcionando funcionalidades críticas que respaldan diversas actividades en el marco de la ética y la seguridad informática.
 
-Aquí, resaltamos algunos aspectos clave que demuestran por qué la librería 're' es esencial en el contexto del Hacking Ético:
+A continuación, resaltamos algunos aspectos clave que demuestran por qué la librería 're' es esencial en el contexto del Hacking Ético:
 
 **1. Detección y Filtrado de Datos Sensibles:**
 
@@ -190,7 +191,7 @@ La suite de inyección SQL se concibe como una respuesta proactiva a las amenaza
 
 ### Definicion de objetivos:
 
-Desarrollar una aplicación de seguridad web con un enfoque global implica abordar varios objetivos clave para fortalecer la resistencia de un sistema a posibles amenazas. Aquí hay un resumen de los aspectos fundamentales:
+Desarrollar una aplicación de seguridad web con un enfoque global implica abordar varios objetivos clave para fortalecer la resistencia de un sistema a posibles amenazas. A continuación enumeramos los aspectos fundamentales que debe satisfacer la aplicación.
 
 1. **Identificación de Vulnerabilidades:**
    * El primer objetivo es identificar posibles vulnerabilidades en el sistema web.
@@ -574,7 +575,6 @@ Basándonos en la experiencia adquirida durante la implementación de la suite S
 Estas recomendaciones buscan mejorar la efectividad y la seguridad en el desarrollo de herramientas de seguridad, teniendo en cuenta la complejidad y la importancia de abordar las vulnerabilidades en el software.
 
 # Documentación base
-
 
 ### Metodología XP (Extreme Programming):
 
