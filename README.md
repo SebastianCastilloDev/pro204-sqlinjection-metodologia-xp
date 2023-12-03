@@ -48,8 +48,8 @@
     - [Tareas de Ingeniería](#tareas-de-ingeniería)
 - [Conclusiones](#conclusiones)
 - [Recomendaciones](#recomendaciones)
-- [Anexo1](#anexo1-documentación-base)
-- [Anexo2](#anexo-2-guía-de-uso-de-la-herramienta)
+- [Anexo 1: Documentación base](#anexo1-documentación-base)
+- [Anexo 2: Guía de uso de la herramienta](#anexo-2-guía-de-uso-de-la-herramienta)
 - [Referencias](#referencias)
 - [Agradecimientos](#agradecimientos)
 
