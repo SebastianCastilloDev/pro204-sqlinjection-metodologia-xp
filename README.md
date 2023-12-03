@@ -43,7 +43,7 @@
     - [HU-Ethical Hacking-016](#hu-ethical-hacking-016)
     - [HU-Ethical Hacking-017](#hu-ethical-hacking-017)
 - [Implementación de Iteraciones](#implementación-de-iteraciones)
-  - [**Planificación de Iteración**](#**planificación-de-iteración**)
+  - [Planificación de Iteración](#planificación-de-iteración)
     - [Planificación del Proyecto](#planificación-del-proyecto)
     - [Tareas de Ingeniería](#tareas-de-ingeniería)
 - [Conclusiones](#conclusiones)
