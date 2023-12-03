@@ -49,6 +49,7 @@
 - [Conclusiones](#conclusiones)
 - [Recomendaciones](#recomendaciones)
 - [Referencias](#referencias)
+- [Agradecimientos](#agradecimientos)
 
 # Introducción
 
@@ -79,7 +80,7 @@ En resumen, Python se ha consolidado como un lenguaje de programación central e
 
 ## Uso de SonarLint
 
-SonarLint se destaca como una herramienta esencial en el contexto de desarrollo seguro y seguridad informática. Al integrarse directamente en los entornos de desarrollo, como Visual Studio Code o IntelliJ IDEA, SonarLint ofrece un análisis estático del código en tiempo real. Este análisis continuo proporciona a los desarrolladores retroalimentación inmediata sobre posibles vulnerabilidades de seguridad, errores de codificación y prácticas no seguras.
+SonarLint se destaca como una herramienta esencial en el contexto de desarrollo seguro y seguridad informática. Al integrarse directamente en los entornos de desarrollo, como Visual Studio Code, SonarLint ofrece un análisis estático del código en tiempo real. Este análisis continuo proporciona a los desarrolladores retroalimentación inmediata sobre posibles vulnerabilidades de seguridad, errores de codificación y prácticas no seguras.
 
 En el ámbito de la ciberseguridad y hacking ético, SonarLint se convierte en un aliado invaluable al identificar y alertar sobre patrones de código que podrían conducir a vulnerabilidades de seguridad. Su capacidad para detectar problemas de seguridad en las primeras etapas del desarrollo permite a los desarrolladores corregir rápidamente posibles riesgos antes de que se integren en el código base. Esto no solo acelera el proceso de desarrollo, sino que también contribuye significativamente a la construcción de aplicaciones más seguras y resistentes a amenazas potenciales.
 
@@ -97,7 +98,7 @@ Las bibliotecas `urllib` y `urllib3` se utilizan para la manipulación de URLs y
 
 ### BeautifulSoup
 
-La biblioteca `BeautifulSoup` se utiliza para analizar el contenido HTML de las respuestas del servidor. Facilita la extracción de información específica del documento HTML, en este caso, la identificación de elementos como las etiquetas `<th>` que contienen datos relevantes.
+La biblioteca BeautifulSoup se utiliza para realizar web scraping, que implica analizar el contenido HTML de las respuestas del servidor. Facilita la extracción de información específica del documento HTML, en este caso, la identificación de elementos como las etiquetas <th> que contienen datos relevantes. Con BeautifulSoup, es posible navegar y buscar de manera eficiente en la estructura HTML para extraer la información deseada durante el proceso de scraping.
 
 ### Sys
 
@@ -133,7 +134,7 @@ A continuación, resaltamos algunos aspectos clave que demuestran por qué la li
 
 **3. Extracción Ética de Datos en Web Scraping:**
 
-* En la fase de reconocimiento ético, 're' facilita la extracción de información necesaria de páginas web, permitiendo a los profesionales de la seguridad recopilar datos relevantes para la evaluación.
+* En la fase de reconocimiento, 're' facilita la extracción de información necesaria de páginas web, permitiendo a los profesionales de la seguridad recopilar datos relevantes para la evaluación.
 
 **4. Análisis Ético de Logs y Archivos:**
 
@@ -522,7 +523,7 @@ A continuación detallaremos cada una de nuestras historias de usuario:
 
 En el proceso de desarrollo de la suite SQLInjection, se adopta una metodología ágil, específicamente Extreme Programming (XP), que facilita la entrega iterativa de funcionalidades valiosas para el producto. La planificación de iteraciones en XP se centra en lo posible y deseable, utilizando reglas que rigen la entrega de cada iteración con el objetivo de incrementar el valor del producto y reducir el tiempo, la inversión y el riesgo asociado al desarrollo.
 
-## **Planificación de Iteración**
+## Planificación de Iteración
 
 La planificación de XP se basa en la identificación de iteraciones previamente establecidas y las historias de usuario esenciales para la implementación del proyecto. Estas iteraciones se desarrollan siguiendo un enfoque just-in-time, evitando tareas no programadas y enfocándose en lo necesario.
 
@@ -574,7 +575,7 @@ Basándonos en la experiencia adquirida durante la implementación de la suite S
 
 Estas recomendaciones buscan mejorar la efectividad y la seguridad en el desarrollo de herramientas de seguridad, teniendo en cuenta la complejidad y la importancia de abordar las vulnerabilidades en el software.
 
-# Documentación base
+# Anexo1: Documentación base
 
 ### Metodología XP (Extreme Programming):
 
@@ -595,7 +596,9 @@ Estas recomendaciones buscan mejorar la efectividad y la seguridad en el desarro
   * [OWASP SQL Injection](https://owasp.org/www-community/attacks/SQL_Injection)
 * **SQL Injection (PortSwigger):**
   * [PortSwigger - SQL Injection](https://portswigger.net/web-security/sql-injection)
-
+  * [PortSwigger - Union-based SQL Injection](https://portswigger.net/web-security/sql-injection/union-attacks)
+  * [PortSwigger - Blind SQL Injection](https://portswigger.net/web-security/sql-injection/blind)
+  
 ### Librerías de Python:
 
 * **Requests Library:**
@@ -625,3 +628,28 @@ Estas recomendaciones buscan mejorar la efectividad y la seguridad en el desarro
   * [SonarLint Rules for Python](https://rules.sonarsource.com/python)
 
 SonarLint es una herramienta de análisis estático de código que puede mejorar la calidad y seguridad del código fuente. Para el contexto de hacking ético, la aplicación de reglas específicas para Python puede ayudar a identificar posibles vulnerabilidades y mejorar la seguridad en el desarrollo de scripts y herramientas relacionadas con la seguridad informática. Las reglas específicas para Python proporcionadas por SonarLint ofrecen pautas valiosas para evitar problemas comunes y garantizar un código más robusto y seguro.
+
+# Agradecimientos
+
+Agradezco sinceramente a los siguientes autores por su valioso aporte y dedicación en la elaboración de sus tesis, las cuales han contribuido significativamente al campo de la metodología de desarrollo de software XP (Extreme Programming) y a la mejora continua de las prácticas de ingeniería de software:
+
+1. **Christian John Cárdenas Tutillo y Edgar Fernando Quimbita Quingaluisa:**
+   * Tesis: "Análisis, Diseño y Construcción de un Prototipo de una Red Social Orientada a la Seguridad para la Empresa CEFOSEG"
+   * Universidad Politécnica Salesiana, Sede Quito.
+2. **Elizabeth Tatiana Pullas Cabezas:**
+   * Tesis: "Desarrollo de un Sistema para Voto Electrónico y Emisión de Resultados en Procesos Electorales de la Escuela Politécnica Nacional"
+   * Escuela Politécnica Nacional, Facultad de Ingeniería de Sistemas.
+3. **Michael Raúl Zambrano Tomalo:**
+   * Tesis: "Desarrollo de una Tienda Virtual Progressive Web Apps (PWA) para Gestionar las Ventas de Productos en la Empresa x (en el documento original se puede ver el nombre de la empresa)"
+   * Universidad Técnica de Ambato, Facultad de Ingeniería en Sistemas, Electrónica e Industrial.
+4. **Luis Aguiar:**
+   * Tesis: "Implementación de una Aplicación para Detección Automatizada de Cambios en Páginas Web para el Prototipo del Archivo Web de Venezuela"
+   * Universidad Central de Venezuela, Facultad de Ciencias, Escuela de Computación.
+
+Su dedicación en la realización de estos trabajos han enriquecido nuestro conocimiento en la metodología XP y su aplicación en el desarrollo de aplicaciones, marcando un impacto positivo en la confección de este documento.
+
+Adicionalmente, me he tomado el atrevimiento de agregar sus tesis de grado a la carpeta "documentos" de este repositorio. La intención es que estas valiosas contribuciones estén disponibles para que otros estudiantes e interesados en la metodología XP puedan aprender de sus investigaciones, de la misma manera en que yo he encontrado conocimiento en sus contenidos. Agradezco profundamente su generosidad al compartir sus trabajos, los cuales sin duda servirán como referencia y guía para futuros proyectos de desarrollo de software.
+
+
+
+
