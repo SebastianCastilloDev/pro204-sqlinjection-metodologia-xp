@@ -1,5 +1,54 @@
 # SQL Injection Suite
 
+# Tabla de Contenidos:
+- [SQL Injection Suite](#sql-injection-suite)
+- [Preliminares](#preliminares)
+  - [Uso de Python en Herramientas de Seguridad y Hacking](#uso-de-python-en-herramientas-de-seguridad-y-hacking)
+  - [Uso de SonarLint](#uso-de-sonarlint)
+  - [Librerías de python utilizadas](#librerías-de-python-utilizadas)
+    - [Urllib y Urllib3](#urllib-y-urllib3)
+    - [BeautifulSoup](#beautifulsoup)
+    - [Sys](#sys)
+    - [Art](#art)
+    - [Colorama](#colorama)
+    - [Re](#re)
+- [Implementacion de la metodología XP](#implementacion-de-la-metodología-xp)
+  - [Definición de Requerimientos y Objetivos de la Aplicación con Metodología XP](#definición-de-requerimientos-y-objetivos-de-la-aplicación-con-metodología-xp)
+    - [Definición de Requerimientos:](#definición-de-requerimientos:)
+    - [Definicion de objetivos:](#definicion-de-objetivos:)
+  - [Fases de la Metodología XP en el Desarrollo de Aplicaciones de Seguridad Web](#fases-de-la-metodología-xp-en-el-desarrollo-de-aplicaciones-de-seguridad-web)
+    - [1. Planificación:](#1.-planificación:)
+    - [2. Diseño:](#2.-diseño:)
+    - [3. Codificación:](#3.-codificación:)
+    - [4. Pruebas:](#4.-pruebas:)
+  - [Roles en XP para Aplicaciones de Seguridad Web:](#roles-en-xp-para-aplicaciones-de-seguridad-web:)
+- [Planificación del Proyecto](#planificación-del-proyecto)
+  - [Historias de usuario](#historias-de-usuario)
+    - [HU-Desarrollo-001](#hu-desarrollo-001)
+    - [HU-Desarrollo-002](#hu-desarrollo-002)
+    - [HU-Interfaz de usuario-003](#hu-interfaz-de-usuario-003)
+    - [HU-Ethical Hacking-004](#hu-ethical-hacking-004)
+    - [HU-Ethical Hacking-005](#hu-ethical-hacking-005)
+    - [HU-Ethical Hacking-006](#hu-ethical-hacking-006)
+    - [HU-Ethical Hacking-007](#hu-ethical-hacking-007)
+    - [HU-Ethical Hacking-008](#hu-ethical-hacking-008)
+    - [HU-Ethical Hacking-009](#hu-ethical-hacking-009)
+    - [HU-Ethical Hacking-010](#hu-ethical-hacking-010)
+    - [HU-Ethical Hacking-011](#hu-ethical-hacking-011)
+    - [HU-Ethical Hacking-012](#hu-ethical-hacking-012)
+    - [HU-Ethical Hacking-013](#hu-ethical-hacking-013)
+    - [HU-Ethical Hacking-014](#hu-ethical-hacking-014)
+    - [HU-Ethical Hacking-015](#hu-ethical-hacking-015)
+    - [HU-Ethical Hacking-016](#hu-ethical-hacking-016)
+    - [HU-Ethical Hacking-017](#hu-ethical-hacking-017)
+- [Implementación de Iteraciones](#implementación-de-iteraciones)
+  - [**Planificación de Iteración**](#**planificación-de-iteración**)
+    - [Planificación del Proyecto](#planificación-del-proyecto)
+    - [Tareas de Ingeniería](#tareas-de-ingeniería)
+- [Conclusiones](#conclusiones)
+- [Recomendaciones](#recomendaciones)
+- [Referencias](#referencias)
+
 # Introducción
 
 En el constante desarrollo de tecnologías de la información y la creciente dependencia de sistemas informáticos en diversos ámbitos, la seguridad de las aplicaciones web se erige como una prioridad ineludible. La preservación de la integridad y confidencialidad de los datos almacenados y transmitidos a través de estas aplicaciones demanda una atención meticulosa hacia posibles vulnerabilidades. Entre las amenazas más comunes se encuentra la inyección SQL, una técnica utilizada por atacantes para comprometer la base de datos subyacente de una aplicación web.
@@ -247,7 +296,6 @@ A continuación detallaremos cada una de nuestras historias de usuario:
 * **Riesgo en el Desarrollo:** Medio.
 * **Programador Responsable:** [Nombre del Desarrollador].
 * **Puntos Estimados:** 6 días.
-* **Iteración Asignada:** Iteración 4.
 * **Descripción:** El analista de seguridad requiere la implementación de un módulo de escaneo de vulnerabilidades que pueda realizar análisis automatizados en busca de posibles puntos débiles en la aplicación. Este módulo debe estar desarrollado utilizando un lenguaje ampliamente adoptado en la comunidad de hacking ético, como Python.
 * **Observación:** La utilización de un lenguaje de programación común en hacking ético, como Python, facilitará la integración de herramientas y scripts adicionales, permitiendo una expansión y personalización efectiva del conjunto de herramientas de seguridad.
 
@@ -259,7 +307,6 @@ A continuación detallaremos cada una de nuestras historias de usuario:
 * **Riesgo en el Desarrollo:** Medio.
 * **Programador Responsable:** [Nombre del Desarrollador].
 * **Puntos Estimados:** 4 días.
-* **Iteración Asignada:** Iteración 3.
 * **Descripción:** El desarrollador integrará la herramienta SonarLint en el entorno de desarrollo de la aplicación de seguridad web.
 * **Observación:** SonarLint proporcionará análisis estático de código en tiempo real, identificando y marcando posibles problemas y violaciones de las mejores prácticas de codificación.
 
@@ -271,7 +318,6 @@ A continuación detallaremos cada una de nuestras historias de usuario:
 * **Riesgo en el Desarrollo:** Bajo.
 * **Programador Responsable:** [Nombre del Desarrollador de Interfaz].
 * **Puntos Estimados:** 8 días.
-* **Iteración Asignada:** Iteración 3.
 * **Descripción:** Como usuario final, deseo una interfaz de usuario clara e intuitiva para el módulo de auditoría de seguridad. La interfaz debe presentar de manera comprensible los resultados de las pruebas de seguridad, con gráficos y estadísticas visuales. Además, debería ser fácil de navegar y permitir la ejecución de nuevas auditorías con solo unos pocos clics.
 * **Observación:** Una interfaz amigable garantizará que los usuarios finales, que pueden no tener experiencia técnica avanzada, puedan comprender y utilizar eficazmente las capacidades del sistema de seguridad. Esto contribuirá a una mejor adopción y aprovechamiento de las funcionalidades ofrecidas.
 
@@ -283,54 +329,54 @@ A continuación detallaremos cada una de nuestras historias de usuario:
 * **Riesgo en el Desarrollo:** Medio.
 * **Programador Responsable:** [Nombre del Equipo de Desarrollo].
 * **Puntos Estimados:** 8 días.
-* **Iteración Asignada:** Iteración 3.
 * **Descripción:** Como usuario del sistema de análisis de seguridad, quiero contar con una funcionalidad que me permita analizar la seguridad de un sitio web en busca de posibles vulnerabilidades de SQL Injection. La herramienta debe encontrar enlaces relevantes para realizar ataques, ejecutar peticiones normales y vulneradas, y presentar de manera clara y comprensible cualquier diferencia en la estructura de la página que pueda indicar una posible vulnerabilidad.
 * **Observación:** Esta funcionalidad proporcionará a los usuarios la capacidad de evaluar la seguridad de un sitio web desde el punto de vista de posibles ataques de inyección SQL. La interfaz debe ser amigable, permitiendo a los usuarios realizar estos análisis de manera eficiente y sin requerir conocimientos técnicos profundos.
 
-### HU-Ethical Hacking-004
-
-1. **Usuario:** Usuario interesado en evaluar la seguridad del sistema.
-2. **Nombre de la Historia:** Evaluación de Seguridad del Sistema.
-3. **Prioridad en el Negocio:** Alta.
-4. **Riesgo en el Desarrollo:** Medio.
-5. **Descripción:**
-   * Como usuario preocupado por la seguridad, quiero utilizar una funcionalidad que me permita evaluar la vulnerabilidad del sistema ante posibles ataques de inyección SQL.
-   * La herramienta deberá simular una inyección SQL en el campo de nombre de usuario durante el proceso de inicio de sesión.
-   * La aplicación deberá identificar y mostrar cualquier indicio de éxito en la inyección SQL, como obtener información privilegiada como el usuario "administrator".
-   * La interfaz debe ser intuitiva, permitiendo al usuario realizar estas evaluaciones de seguridad de manera sencilla, incluso sin conocimientos técnicos avanzados.
-6. **Observación:**
-   * Esta funcionalidad proporciona a los usuarios una herramienta práctica para evaluar la resistencia del sistema contra ataques de inyección SQL.
-   * La interfaz amigable facilita el uso de la herramienta, permitiendo a los usuarios realizar evaluaciones de seguridad de manera eficiente.
-
 ### HU-Ethical Hacking-005
 
-1. **Usuario:** Usuario del sistema de evaluación de seguridad.
-2. **Nombre de la Historia:** Identificación de la Versión de Oracle.
-3. **Prioridad en el Negocio:** Media.
-4. **Riesgo en el Desarrollo:** Bajo.
-5. **Descripción:**
-   * Como usuario interesado en la seguridad, deseo contar con una funcionalidad que me permita identificar la versión específica de la base de datos Oracle en un sistema remoto.
-   * La herramienta realizará una inyección SQL de búsqueda en la categoría "Lifestyle" del sitio web atacado para obtener información sobre la versión de Oracle.
-   * La aplicación presentará claramente la versión específica de la base de datos Oracle obtenida.
-6. **Observación:**
-   * Esta funcionalidad proporciona a los usuarios la capacidad de reconocer la versión precisa de la base de datos Oracle utilizada en el sistema atacado.
-   * La interfaz debe reflejar de manera concisa la información obtenida sobre la versión de Oracle.
+* **Usuario:** Usuario interesado en evaluar la seguridad del sistema.
+* **Nombre de la Historia:** Evaluación de Seguridad del Sistema.
+* **Prioridad en el Negocio:** Alta.
+* **Riesgo en el Desarrollo:** Medio.
+* **Descripción:**
+  * Como usuario preocupado por la seguridad, quiero utilizar una funcionalidad que me permita evaluar la vulnerabilidad del sistema ante posibles ataques de inyección SQL.
+  * La herramienta deberá simular una inyección SQL en el campo de nombre de usuario durante el proceso de inicio de sesión.
+  * La aplicación deberá identificar y mostrar cualquier indicio de éxito en la inyección SQL, como obtener información privilegiada como el usuario "administrator".
+  * La interfaz debe ser intuitiva, permitiendo al usuario realizar estas evaluaciones de seguridad de manera sencilla, incluso sin conocimientos técnicos avanzados.
+* **Observación:**
+  * Esta funcionalidad proporciona a los usuarios una herramienta práctica para evaluar la resistencia del sistema contra ataques de inyección SQL.
+  * La interfaz amigable facilita el uso de la herramienta, permitiendo a los usuarios realizar evaluaciones de seguridad de manera eficiente.
 
 ### HU-Ethical Hacking-006
 
-1. **Usuario:** Usuario del sistema de análisis de seguridad.
-2. **Nombre de la Historia:** Determinación de la Versión de Bases de Datos MySQL y SQL Server.
-3. **Prioridad en el Negocio:** Alta.
-4. **Riesgo en el Desarrollo:** Medio.
-5. **Descripción:**
-   * Como usuario del sistema de análisis de seguridad, deseo contar con una funcionalidad que me permita determinar la versión específica de las bases de datos MySQL y SQL Server en un sitio web objetivo.
-   * La herramienta realizará una serie de pruebas de inyección SQL para identificar el número de columnas en las tablas relevantes y, a partir de ello, construirá un payload para obtener información sobre la versión de MySQL y SQL Server.
-   * La aplicación presentará claramente la versión específica de MySQL y SQL Server obtenida.
-6. **Observación:**
-   * Esta funcionalidad proporciona a los usuarios la capacidad de conocer la versión precisa de las bases de datos MySQL y SQL Server utilizadas en el sistema atacado.
-   * La interfaz debe reflejar de manera concisa la información obtenida sobre las versiones de MySQL y SQL Server.
+* **Usuario:** Usuario del sistema de evaluación de seguridad.
+* **Nombre de la Historia:** Identificación de la Versión de Oracle.
+* **Prioridad en el Negocio:** Media.
+* **Riesgo en el Desarrollo:** Bajo.
+* **Descripción:**
+  * Como usuario interesado en la seguridad, deseo contar con una funcionalidad que me permita identificar la versión específica de la base de datos Oracle en un sistema remoto.
+  * La herramienta realizará una inyección SQL de búsqueda en la categoría "Lifestyle" del sitio web atacado para obtener información sobre la versión de Oracle.
+  * La aplicación presentará claramente la versión específica de la base de datos Oracle obtenida.
+* **Observación:**
+  * Esta funcionalidad proporciona a los usuarios la capacidad de reconocer la versión precisa de la base de datos Oracle utilizada en el sistema atacado.
+  * La interfaz debe reflejar de manera concisa la información obtenida sobre la versión de Oracle.
 
 ### HU-Ethical Hacking-007
+
+* **Usuario:** Usuario del sistema de análisis de seguridad.
+* **Nombre de la Historia:** Determinación de la Versión de Bases de Datos MySQL y SQL Server.
+* **Prioridad en el Negocio:** Alta.
+* **Riesgo en el Desarrollo:** Medio.
+* **Programador Responsable**: [Nombre del equipo de desarrollo].
+* **Descripción:**
+  * Como usuario del sistema de análisis de seguridad, deseo contar con una funcionalidad que me permita determinar la versión específica de las bases de datos MySQL y SQL Server en un sitio web objetivo.
+  * La herramienta realizará una serie de pruebas de inyección SQL para identificar el número de columnas en las tablas relevantes y, a partir de ello, construirá un payload para obtener información sobre la versión de MySQL y SQL Server.
+  * La aplicación presentará claramente la versión específica de MySQL y SQL Server obtenida.
+* **Observación:**
+  * Esta funcionalidad proporciona a los usuarios la capacidad de conocer la versión precisa de las bases de datos MySQL y SQL Server utilizadas en el sistema atacado.
+  * La interfaz debe reflejar de manera concisa la información obtenida sobre las versiones de MySQL y SQL Server.
+
+### HU-Ethical Hacking-008
 
 * **Usuario:** Usuario del sistema de análisis de seguridad.
 * **Nombre de la Historia:** Exploración de Enlaces Relevantes.
@@ -338,12 +384,11 @@ A continuación detallaremos cada una de nuestras historias de usuario:
 * **Riesgo en el Desarrollo:** Medio.
 * **Programador Responsable:** [Nombre del Equipo de Desarrollo].
 * **Puntos Estimados:** 5 días.
-* **Iteración Asignada:** Iteración 4.
 * **Descripción:**
   * Como usuario, deseo explorar y seleccionar enlaces relevantes en el sitio web objetivo para llevar a cabo análisis de seguridad.
   * La aplicación debe presentar una lista de enlaces de interés detectados en la sección de filtros del sitio web, permitiéndome seleccionar el enlace específico desde el cual deseo realizar un ataque.
 
-### HU-Ethical Hacking-008
+### HU-Ethical Hacking-009
 
 * **Usuario:** Usuario del sistema de análisis de seguridad.
 * **Nombre de la Historia:** Identificación del Número de Columnas en la Tabla Relevante.
@@ -351,12 +396,11 @@ A continuación detallaremos cada una de nuestras historias de usuario:
 * **Riesgo en el Desarrollo:** Medio.
 * **Programador Responsable:** [Nombre del Equipo de Desarrollo].
 * **Puntos Estimados:** 8 días.
-* **Iteración Asignada:** Iteración 4.
 * **Descripción:**
   * Como usuario, necesito identificar el número de columnas en la tabla relevante del sitio web objetivo para preparar ataques específicos.
   * La aplicación debe realizar pruebas de inyección SQL para determinar el número de columnas en la tabla y presentar esta información de manera clara.
 
-### HU-Ethical Hacking-009
+### HU-Ethical Hacking-010
 
 * **Usuario:** Usuario del sistema de análisis de seguridad.
 * **Nombre de la Historia:** Recuperación de Lista de Tablas en la Base de Datos.
@@ -364,12 +408,11 @@ A continuación detallaremos cada una de nuestras historias de usuario:
 * **Riesgo en el Desarrollo:** Medio.
 * **Programador Responsable:** [Nombre del Equipo de Desarrollo].
 * **Puntos Estimados:** 5 días.
-* **Iteración Asignada:** Iteración 4.
 * **Descripción:**
   * Como usuario, quiero obtener una lista de las tablas presentes en la base de datos del sitio web atacado para entender su estructura.
   * La aplicación debe realizar consultas SQL para recuperar la lista de tablas y presentarlas de manera clara para su selección.
 
-### HU-Ethical Hacking-010
+### HU-Ethical Hacking-011
 
 * **Usuario:** Usuario del sistema de análisis de seguridad.
 * **Nombre de la Historia:** Consulta Detallada de Columnas en una Tabla Específica.
@@ -377,12 +420,11 @@ A continuación detallaremos cada una de nuestras historias de usuario:
 * **Riesgo en el Desarrollo:** Medio.
 * **Programador Responsable:** [Nombre del Equipo de Desarrollo].
 * **Puntos Estimados:** 8 días.
-* **Iteración Asignada:** Iteración 4.
 * **Descripción:**
   * Como usuario, quiero obtener detalles sobre las columnas específicas de una tabla en la base de datos del sitio web atacado.
   * La aplicación debe presentar las columnas disponibles en la tabla seleccionada, permitiéndome elegir las columnas a consultar.
 
-### HU-Ethical Hacking-011
+### HU-Ethical Hacking-012
 
 * **Usuario:** Usuario del sistema de análisis de seguridad.
 * **Nombre de la Historia:** Consulta de Datos en Columnas Seleccionadas.
@@ -390,12 +432,11 @@ A continuación detallaremos cada una de nuestras historias de usuario:
 * **Riesgo en el Desarrollo:** Medio.
 * **Programador Responsable:** [Nombre del Equipo de Desarrollo].
 * **Puntos Estimados:** 10 días.
-* **Iteración Asignada:** Iteración 4.
 * **Descripción:**
   * Como usuario, deseo realizar consultas específicas en las columnas seleccionadas de la tabla para obtener información detallada.
   * La aplicación debe permitirme ingresar las columnas a consultar y mostrar los resultados obtenidos de manera clara y estructurada.
 
-### HU-Ethical Hacking-012
+### HU-Ethical Hacking-013
 
 * **Usuario:** Usuario del sistema de análisis de seguridad.
 * **Nombre de la Historia:** Recuperación Segura de Datos de Otras Tablas.
@@ -403,57 +444,42 @@ A continuación detallaremos cada una de nuestras historias de usuario:
 * **Riesgo en el Desarrollo:** Medio.
 * **Programador Responsable:** [Nombre del Equipo de Desarrollo].
 * **Puntos Estimados:** 8 días.
-* **Iteración Asignada:** Iteración 4.
 * **Descripción:**
   * Como usuario, deseo utilizar la herramienta para recuperar datos de otras tablas de la base de datos del sitio web de manera segura y sin riesgos.
   * La aplicación debe proporcionar una interfaz clara que me permita seleccionar la tabla de interés y realizar la recuperación de datos sin comprometer la seguridad del sistema.
   * Se espera que el proceso sea guiado, indicándome qué información se está recuperando y evitando riesgos innecesarios en la operación.
 
-### HU-Ethical Hacking-013
-
-1. * **Usuario:** Usuario del sistema de análisis de seguridad.
-   * **Nombre de la Historia:** Recuperación Eficiente de Datos de una Tabla.
-   * **Prioridad en el Negocio:** Alta.
-   * **Riesgo en el Desarrollo:** Medio.
-   * **Programador Responsable:** [Nombre del Equipo de Desarrollo].
-   * **Puntos Estimados:** 8 días.
-   * **Iteración Asignada:** Iteración 4.
-   * **Descripción:**
-     * Como usuario, deseo recuperar de manera eficiente múltiples valores de una tabla específica en una sola columna de la base de datos del sitio web.
-     * La aplicación debe permitirme seleccionar la tabla de interés y realizar la recuperación de datos, presentándolos de manera clara y organizada.
-     * Se espera que el proceso sea guiado, indicándome qué información se está recuperando y evitando riesgos innecesarios en la operación.
-     * La interfaz debe proporcionarme la flexibilidad de elegir la tabla y la columna de la que deseo recuperar los datos, garantizando un análisis preciso.
-
 ### HU-Ethical Hacking-014
 
-
-
-**Usuario:** Analista de Seguridad.
-
-**Nombre de la Historia:** Obtener Contraseña del Administrador - Blind SQL Injection.
-
-**Prioridad en el Negocio:** Alta.
-
-**Riesgo en el Desarrollo:** Alto.
-
-**Programador Responsable:** [Nombre del Equipo de Seguridad].
-
-**Puntos Estimados:** 12 días.
-
-**Iteración Asignada:** Iteración 5.
-
-**Descripción:**
-
-* Como analista de seguridad, deseo realizar una inyección SQL ciega (Blind SQL Injection) para obtener la contraseña del usuario administrador en el sistema.
-* La aplicación debe confirmar la vulnerabilidad del parámetro de la cookie para proceder con el ataque.
-* Se requiere confirmar la existencia de la tabla 'users' en la base de datos Oracle para continuar con el proceso.
-* El sistema debe verificar la presencia del usuario 'administrator' en la tabla 'users' antes de intentar la extracción de la contraseña.
-* El analista espera que el sistema determine la longitud de la contraseña antes de realizar un ataque de fuerza bruta para extraer cada caracter de la contraseña.
-* El resultado final debería ser la contraseña completa del usuario administrador presentada de manera clara y segura.
-
-
+* **Usuario:** Usuario del sistema de análisis de seguridad.
+* **Nombre de la Historia:** Recuperación Eficiente de Datos de una Tabla.
+* **Prioridad en el Negocio:** Alta.
+* **Riesgo en el Desarrollo:** Medio.
+* **Programador Responsable:** [Nombre del Equipo de Desarrollo].
+* **Puntos Estimados:** 8 días.
+* **Descripción:**
+  * Como usuario, deseo recuperar de manera eficiente múltiples valores de una tabla específica en una sola columna de la base de datos del sitio web.
+  * La aplicación debe permitirme seleccionar la tabla de interés y realizar la recuperación de datos, presentándolos de manera clara y organizada.
+  * Se espera que el proceso sea guiado, indicándome qué información se está recuperando y evitando riesgos innecesarios en la operación.
+  * La interfaz debe proporcionarme la flexibilidad de elegir la tabla y la columna de la que deseo recuperar los datos, garantizando un análisis preciso.
 
 ### HU-Ethical Hacking-015
+
+* **Usuario:** Analista de Seguridad.
+* **Nombre de la Historia:** Obtener Contraseña del Administrador - Blind SQL Injection.
+* **Prioridad en el Negocio:** Alta.
+* **Riesgo en el Desarrollo:** Alto.
+* **Programador Responsable:** [Nombre del Equipo de Seguridad].
+* **Puntos Estimados:** 12 días.
+* **Descripción:**
+  * Como analista de seguridad, quiero realizar una inyección SQL ciega (Blind SQL Injection) para obtener la contraseña del usuario administrador en el sistema.
+  * La aplicación debe confirmar la vulnerabilidad del parámetro de la cookie antes de proceder con el ataque.
+  * Se requiere confirmar la existencia de la tabla 'users' en la base de datos Oracle para continuar con el proceso.
+  * El sistema debe verificar la presencia del usuario 'administrator' en la tabla 'users' antes de intentar la extracción de la contraseña.
+  * El analista espera que el sistema determine la longitud de la contraseña antes de realizar un ataque de fuerza bruta para extraer cada caracter de la contraseña.
+  * El resultado final debería ser la contraseña completa del usuario administrador, presentada de manera clara y segura.
+
+### HU-Ethical Hacking-016
 
 * **Usuario:** Analista de Seguridad.
 * **Nombre de la Historia:** Obtener Contraseña del Administrador - Blind SQL Injection con Errores Condicionales.
@@ -472,8 +498,7 @@ A continuación detallaremos cada una de nuestras historias de usuario:
   * La historia incluye la implementación de medidas para asegurar que el ataque sea controlado y no cause daño al sistema ni a los datos.
   * Se documentarán las pruebas realizadas y los resultados obtenidos durante el proceso de inyección SQL ciega con errores condicionales para futuras auditorías de seguridad.
 
-
-### HU-Ethical Hacking-016
+### HU-Ethical Hacking-017
 
 * **Usuario:** Analista de Seguridad.
 * **Nombre de la Historia:** Obtener Contraseña del Administrador - Blind SQL Injection con Retraso de Tiempo.
@@ -491,3 +516,112 @@ A continuación detallaremos cada una de nuestras historias de usuario:
   * La contraseña del usuario administrador se presentará claramente al finalizar el proceso mediante retraso de tiempo en las respuestas.
   * La historia incluye la implementación de medidas para asegurar que el ataque sea controlado y no cause daño al sistema ni a los datos.
   * Se documentarán las pruebas realizadas y los resultados obtenidos durante el proceso de inyección SQL ciega con retraso de tiempo para futuras auditorías de seguridad.
+
+# Implementación de Iteraciones
+
+En el proceso de desarrollo de la suite SQLInjection, se adopta una metodología ágil, específicamente Extreme Programming (XP), que facilita la entrega iterativa de funcionalidades valiosas para el producto. La planificación de iteraciones en XP se centra en lo posible y deseable, utilizando reglas que rigen la entrega de cada iteración con el objetivo de incrementar el valor del producto y reducir el tiempo, la inversión y el riesgo asociado al desarrollo.
+
+## **Planificación de Iteración**
+
+La planificación de XP se basa en la identificación de iteraciones previamente establecidas y las historias de usuario esenciales para la implementación del proyecto. Estas iteraciones se desarrollan siguiendo un enfoque just-in-time, evitando tareas no programadas y enfocándose en lo necesario.
+
+### Planificación del Proyecto
+
+La identificación de iteraciones y las historias de usuario es crucial para la planificación. La ejecución de tareas específicas, derivadas de las historias de usuario seleccionadas, se basa en estimaciones de tiempo para cada actividad, permitiendo una ejecución ágil y eficiente del proyecto.
+
+Esta planificación en iteraciones se alinea con la filosofía de programación just-in-time, asegurando que las tareas planificadas sean necesarias y contribuyan al valor del producto.
+
+### Tareas de Ingeniería
+
+Para llevar a cabo la implementación de las historias de usuario, se siguen varias tareas de diseño según la metodología XP:
+
+* **Diseño CRC (Cargo, Responsabilidad, Colaboración):** Las tarjetas CRC se utilizan para trabajar con una metodología basada en objetos, identificando clases, responsabilidades y colaboraciones que se traducen en métodos y relaciones.
+* **Diseño de Datos:** Se realiza para mostrar el alcance de la aplicación, proporcionando una visión clara de las tareas que llevará a cabo el proyecto.
+* **Documentación de Escenario:** Se enfoca en almacenar o documentar los diseños que proponen soluciones para los escenarios identificados en las historias de usuario.
+* **Programación:** La implementación de cada escenario, correspondiente a una historia de usuario específica.
+* **Ejecución de Pruebas:** La ejecución de pruebas está estrechamente relacionada con la planificación de iteraciones, y se lleva a cabo para garantizar la calidad del código desarrollado.
+* **Documentación de Pruebas de Aceptación:** La documentación de las pruebas de aceptación valida la correcta implementación de cada historia de usuario.
+
+La ejecución de estas tareas se realiza de manera iterativa, lo que permite mantener discusiones continuas sobre los avances y problemas, fomentando la comunicación entre las partes involucradas y optimizando el tiempo y esfuerzo dedicados al proyecto.
+
+En resumen, la planificación de iteraciones en el desarrollo de la suite SQLInjection, basada en la metodología XP, proporciona agilidad, enfoque en lo esencial y una comunicación efectiva, contribuyendo al éxito del proyecto.
+
+# Conclusiones
+
+En primer lugar, la adopción de la metodología XP demostró ser un enfoque eficaz para el desarrollo de la suite, permitiendo una entrega iterativa y continua de funcionalidades clave. La planificación en iteraciones, junto con la flexibilidad para adaptarse a cambios en los requisitos, facilitó una respuesta ágil a las necesidades emergentes.
+
+La colaboración activa entre los miembros del equipo, un principio fundamental de XP, jugó un papel crucial en el éxito del proyecto. La comunicación continua y la participación de todos los miembros permitieron una comprensión compartida de los objetivos y desafíos, contribuyendo a un ambiente de trabajo colaborativo y eficiente.
+
+La implementación de prácticas XP, como el diseño CRC, el diseño iterativo y la programación just-in-time, no solo aceleró el proceso de desarrollo, sino que también mejoró la calidad del producto final. La incorporación de pruebas de aceptación desde el principio garantizó la integridad y funcionalidad de cada historia de usuario.
+
+En retrospectiva, el enfoque ágil de XP no solo demostró ser compatible con el desarrollo de una suite de seguridad como SQLInjection, sino que también resaltó la importancia de la adaptabilidad y la colaboración en entornos de desarrollo dinámicos.
+
+Estas conclusiones reflejan el éxito de la implementación de la suite SQLInjection bajo la metodología XP, subrayando la eficacia de los principios ágiles en el contexto de proyectos centrados en la seguridad del software.
+
+# Recomendaciones
+
+Basándonos en la experiencia adquirida durante la implementación de la suite SQLInjection bajo la metodología XP, se presentan las siguientes recomendaciones para futuros proyectos de desarrollo de herramientas de seguridad:
+
+* **Mantenimiento de la Comunicación Constante:** La comunicación continua y efectiva entre los miembros del equipo es fundamental. Se recomienda mantener canales abiertos de comunicación para abordar cambios en los requisitos, desafíos técnicos y actualizaciones de estado.
+* **Enfoque Iterativo y Adaptable:** La metodología XP se destaca por su enfoque iterativo. Se recomienda mantener la flexibilidad y la capacidad de adaptación a medida que evolucionan los requisitos del proyecto. Las iteraciones permiten ajustes continuos y mejoras graduales.
+* **Énfasis en la Seguridad desde el Inicio:** Debemos integrar prácticas de seguridad desde las primeras etapas del desarrollo. En el contexto de una suite de seguridad como SQLInjection, la identificación y mitigación temprana de posibles vulnerabilidades son esenciales.
+* **Automatización de Pruebas:** Debemos priorizar la automatización de pruebas, especialmente las pruebas de aceptación. La inclusión temprana de pruebas automatizadas contribuye a la detección temprana de problemas y garantiza la estabilidad y seguridad del producto final.
+* **Colaboración Activa:** Debemos fomentar la colaboración activa y la participación de todos los miembros del equipo en las decisiones y el diseño. La diversidad de perspectivas contribuye a soluciones más robustas y completas.
+* **Documentación Clara y Concisa:** Debemos mantener una documentación clara y concisa de cada iteración y funcionalidad implementada. Esto facilitará la comprensión para futuros desarrolladores, evaluadores de seguridad y usuarios finales.
+* **Capacitación Continua:** Debemos invertir en la capacitación continua del equipo en las últimas tendencias y mejores prácticas de seguridad. La seguridad cibernética es un campo en constante evolución, y el equipo debe mantenerse actualizado con las últimas amenazas y contramedidas.
+* **Evaluación Periódica de Vulnerabilidades:** Debemos realizar evaluaciones periódicas de seguridad en la suite desarrollada. Esto garantizará la identificación y mitigación proactiva de posibles amenazas a medida que surgen nuevas vulnerabilidades.
+
+Estas recomendaciones buscan mejorar la efectividad y la seguridad en el desarrollo de herramientas de seguridad, teniendo en cuenta la complejidad y la importancia de abordar las vulnerabilidades en el software.
+
+# Documentación base
+
+
+### Metodología XP (Extreme Programming):
+
+* **Extreme Programming: A Gentle Introduction:**
+  * [Extreme Programming: A Gentle Introduction](http://www.extremeprogramming.org/)
+* **Extreme Programming Explained: Embrace Change (Libro de Kent Beck):**
+  * [Extreme Programming Explained on Amazon](https://www.amazon.com/Extreme-Programming-Explained-Kent-Beck/dp/0321278658)
+
+### Técnicas de SQL Injection:
+
+* **OWASP SQL Injection Prevention Cheat Sheet:**
+  * [OWASP SQL Injection Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html)
+* **SQLMap:**
+  * Repositorio en GitHub:[SQLMap on GitHub](https://github.com/sqlmapproject/sqlmap)
+* **SQL Injection (W3Schools):**
+  * [SQL Injection - W3Schools](https://www.w3schools.com/sql/sql_injection.asp)
+* **SQL Injection (OWASP):**
+  * [OWASP SQL Injection](https://owasp.org/www-community/attacks/SQL_Injection)
+* **SQL Injection (PortSwigger):**
+  * [PortSwigger - SQL Injection](https://portswigger.net/web-security/sql-injection)
+
+### Librerías de Python:
+
+* **Requests Library:**
+  * Documentación Oficial:[Requests](https://docs.python-requests.org/en/latest/)
+  * Repositorio en GitHub:[Requests on GitHub](https://github.com/psf/requests)
+* **Beautiful Soup:**
+  * Documentación Oficial:[Beautiful Soup Documentation](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
+  * Repositorio en GitHub:[Beautiful Soup on GitHub](https://github.com/wention/BeautifulSoup4)
+* **Regular Expressions (re):**
+  * Documentación Oficial:[re - Regular expression operations](https://docs.python.org/3/library/re.html)
+* **Colorama:**
+  * Repositorio en GitHub:[Colorama on GitHub](https://github.com/tartley/colorama)
+* **Art (ASCII Art Generator):**
+  * Repositorio en GitHub:[Art on GitHub](https://github.com/sepandhaghighi/art)
+* **Sys (Sys Module):**
+  * Documentación Oficial:[sys - System-specific parameters and functions](https://docs.python.org/3/library/sys.html)
+* **Urllib and Urllib3:**
+  * Documentación de Urllib:[Urllib - URL handling modules](https://docs.python.org/3/library/urllib.html)
+  * Documentación de Urllib3:[Urllib3 - HTTP library with thread-safe connection pooling](https://urllib3.readthedocs.io/)
+
+### SonarLint y Reglas para Python:
+
+* **SonarLint:**
+  * [SonarLint Official Website](https://www.sonarlint.org/)
+  * [SonarLint on GitHub](https://github.com/SonarSource/SonarLint)
+* **SonarLint Reglas para Python:**
+  * [SonarLint Rules for Python](https://rules.sonarsource.com/python)
+
+SonarLint es una herramienta de análisis estático de código que puede mejorar la calidad y seguridad del código fuente. Para el contexto de hacking ético, la aplicación de reglas específicas para Python puede ayudar a identificar posibles vulnerabilidades y mejorar la seguridad en el desarrollo de scripts y herramientas relacionadas con la seguridad informática. Las reglas específicas para Python proporcionadas por SonarLint ofrecen pautas valiosas para evitar problemas comunes y garantizar un código más robusto y seguro.
