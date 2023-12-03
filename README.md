@@ -598,7 +598,7 @@ Estas recomendaciones buscan mejorar la efectividad y la seguridad en el desarro
   * [PortSwigger - SQL Injection](https://portswigger.net/web-security/sql-injection)
   * [PortSwigger - Union-based SQL Injection](https://portswigger.net/web-security/sql-injection/union-attacks)
   * [PortSwigger - Blind SQL Injection](https://portswigger.net/web-security/sql-injection/blind)
-  
+
 ### Librerías de Python:
 
 * **Requests Library:**
@@ -650,6 +650,5 @@ Su dedicación en la realización de estos trabajos han enriquecido nuestro cono
 
 Adicionalmente, me he tomado el atrevimiento de agregar sus tesis de grado a la carpeta "documentos" de este repositorio. La intención es que estas valiosas contribuciones estén disponibles para que otros estudiantes e interesados en la metodología XP puedan aprender de sus investigaciones, de la misma manera en que yo he encontrado conocimiento en sus contenidos. Agradezco profundamente su generosidad al compartir sus trabajos, los cuales sin duda servirán como referencia y guía para futuros proyectos de desarrollo de software.
 
-
-
+Un agradecimiento especial a Rana Khalil, Michael Sommer y Z3nsh3ll por su valioso aporte desde sus canales de YouTube. Sus contenidos han sido una fuente valiosa de inspiración para el desarrollo de este proyecto. Han tenido un impacto importante en mi aprendizaje y en la calidad de este trabajo.
 
